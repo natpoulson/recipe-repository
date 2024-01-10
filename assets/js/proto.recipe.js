@@ -1,3 +1,33 @@
+class Recipe {
+    id = 0;
+    title = "";
+    image = "";
+    servings = 0;
+    prep = 0;
+    description = "";
+
+    // This is a getter which functions as a placeholder for card output
+    get template() {
+        return `<div class="row" style="padding-left: 50px; padding-right: 50px">
+        <div class="col s12 m6 l3">
+          <div class="card" style="border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; border-top-right-radius: 25px; border-top-left-radius: 25px;">
+            <div class="card-image">
+              <img src="${this.image}" style="border-top-right-radius: 25px; border-top-left-radius: 25px;" alt="${this.title}" />
+              <a class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">read_more</i></a>
+            </div>
+            <div class="card-content"
+              style="background-color: #f5f5f5; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
+              <span class="card-title">${this.title}</span>
+              <p>
+                ${this.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>`
+    }
+}
+
 // Functions with promise-based searches are called normally
 function promiseSearch(query, resultCap = 10) {
     // The fetch function needs to be returned either directly or via a variable
