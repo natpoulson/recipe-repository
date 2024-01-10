@@ -73,3 +73,54 @@ footer {
 #preparation {
   line-height: 1.6;
 }
+
+/* STACEY WORK FOR FAVOURITE MODAL*/
+
+/* STACEY WORK FOR FAVOURITE MODAL */
+.favouritesCard {
+  position: fixed;
+  top: 0;
+  /*left: 100%;*/
+  left: calc(100% - 500px);
+  width: 500px;
+  background-color: #9c0909;
+  height: 100vh;
+  transition: left 0.5s; /* Fix transition property */
+  z-index: 2;
+}
+
+.hidden {
+  display: none;
+}
+
+.favouritesCard h2 {
+  color: aqua;
+  font-weight: 100;
+  margin: 0;
+  padding: 0 20px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.favouritesCard .closeSidebar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: grid;
+  background-color: #ff9999;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+/*.active .favouritesCard {
+  left: calc(100% - 500px);
+}
+
+/* Remove the stray comma in the next line */
+.active .container {
+  transform: translate(-200px);
+}
