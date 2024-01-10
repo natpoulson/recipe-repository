@@ -6,6 +6,7 @@
 footer {
   font-family: "July it", sans-serif;
 }
+
 footer {
   background-color: #ff9999;
 }
@@ -28,7 +29,7 @@ footer {
   background-color: #f0bebe27;
 }
 
-.search button {
+.search button, #readMoreBtn {
   font-size: 16px;
   background: #ff9999f4;
   border-radius: 10px;
@@ -52,6 +53,20 @@ footer {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.timeServesIcons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.favIconDiv{
+  display: flex;
+  justify-content: end;
+  position: relative;
+  right: 20px;
+  bottom: 26px;
+  float: right;
 }
 
 /* recipe.html custom css */
