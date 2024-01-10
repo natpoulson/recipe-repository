@@ -5,6 +5,14 @@ class Recipe {
     servings = 0;
     prep = 0;
     description = "";
+    instructions = [];
+    ingredients = [];
+    allergens = {
+        dairy: false,
+        gluten: false,
+        nuts: false, // There's nothing explicitly in the results returned for this. Considering options
+        shrimp: false //Nothing explicitly stated for this
+    };
 
     // This is a getter which functions as a placeholder for card output
     get template() {
