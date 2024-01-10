@@ -151,7 +151,7 @@
     <!--Recipe Cards section -->
     <section class="fcards">
       <div class="alert">
-        <!-- <div class="row" style="padding-left: 50px; padding-right: 50px">
+       <!--  <div class="row" style="padding-left: 50px; padding-right: 50px">
           <div class="col s12 m6 l3">
             <div
               class="card"
@@ -171,10 +171,28 @@
                   "
                   alt=""
                 />
-                <a class="btn-floating halfway-fab waves-effect waves-light red"
-                  ><i class="material-icons">read_more</i></a
+
+                <div
+                  style="
+                    display: flex;
+                    justify-content: end;
+                    position: relative;
+                    right: 20px;
+                    bottom: 26px;
+                    float: right;
+                  "
                 >
+                  <a
+                    style="margin-right: 12px"
+                    class="btn-floating waves-effect waves-light red"
+                    ><i class="material-icons">favorite</i></a
+                  >
+                  <a class="btn-floating waves-effect waves-light red accent-1"
+                    ><i class="material-icons">volume_up</i></a
+                  >
+                </div>
               </div>
+
               <div
                 class="card-content"
                 style="
@@ -186,9 +204,33 @@
                 <span class="card-title">Recipe Title</span>
                 <p>
                   I am a very simple card. I am good at containing small bits of
-                  information. I am convenient because I require little markup
-                  to use effectively.
+                  information.
                 </p>
+                <div class="timeServesIcons">
+                  <div>
+                    <a
+                      class="btn-floating waves-effect waves-light red accent-1"
+                      ><i class="material-icons">schedule</i></a
+                    >
+                    <p>Min</p>
+                  </div>
+                  <div>
+                    <a
+                      class="btn-floating waves-effect waves-light red accent-1"
+                      ><i class="material-icons">restaurant</i></a
+                    >
+                    <p>Serves</p>
+                  </div>
+                </div>
+                <div style="padding-top: 15px; text-align: center">
+                  <button
+                    style="width: 100%"
+                    class="waves-effect waves-light btn-large"
+                    id="readMoreBtn"
+                  >
+                    Read more
+                  </button>
+                </div>
               </div>
             </div>
           </div>

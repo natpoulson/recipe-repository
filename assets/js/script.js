@@ -1,3 +1,4 @@
+/* initiate materialize */
 $(document).ready(function () {
   $(".modal").modal();
   $(".parallax").parallax();
@@ -13,10 +14,10 @@ function toggleModal() {
 
 const apiKey = "1ad7150895a748249f035aea5efa456f";
 const searchInput = document.getElementById("search-input");
-const recipeList = document.getElementById("recipe-list");
 const searchBtn = document.getElementById("searchBtn");
 var card = $(".fcards");
 var alertdiv = $(".alert");
+
 function searchRecipes() {
   const query = searchInput.value;
   if (!query) {
@@ -43,12 +44,15 @@ function searchRecipes() {
     .catch((error) => console.error("Error fetching recipes:", error));
 }
 
+/* Function to display the recipe card */
 function displayRecipes(recipes) {
   console.log(recipes);
   var card = $(".fcards");
   var rowDiv1 = $("<div>");
   rowDiv1.attr("class", "row");
-  rowDiv1.css("padding","50px");
+  rowDiv1.css("padding", "50px");
+
+  /* loop recipes results to display image and title */
   recipes.forEach((recipe) => {
     //1
     card.append(rowDiv1);
@@ -77,19 +81,34 @@ function displayRecipes(recipes) {
       "border-top-right-radius": "25px",
       "border-top-left-radius": "25px",
     });
+
     //6
-    var cardImageBtn = $("<a>");
-    cardImageBtn.attr(
-      "class",
-      "btn-floating halfway-fab waves-effect waves-light red"
-    );
-    var favIcon = $("<i>");
-    favIcon.attr("class", "material-icons");
-    favIcon.text("read_more");
-    cardImageBtn.append(favIcon);
-    cardImageDiv.append(cardImage);
-    cardImageDiv.append(cardImageBtn);
+    var iconDiv = $("<div>");
+    iconDiv.attr("class", "favIconDiv");
     //7
+    var cardImageBtn1 = $("<a>");
+    cardImageBtn1.css("margin-right", "12px");
+    cardImageBtn1.attr("class", "btn-floating waves-effect waves-light red");
+    var favIcon1 = $("<i>");
+    favIcon1.attr("class", "material-icons");
+    favIcon1.text("favorite");
+    cardImageBtn1.append(favIcon1);
+    //8
+    var cardImageBtn2 = $("<a>");
+    cardImageBtn2.attr(
+      "class",
+      "btn-floating waves-effect waves-light red accent-1"
+    );
+    var favIcon2 = $("<i>");
+    favIcon2.attr("class", "material-icons");
+    favIcon2.text("volume_up");
+    cardImageBtn2.append(favIcon2);
+
+    iconDiv.append(cardImageBtn1);
+    iconDiv.append(cardImageBtn2);
+    cardImageDiv.append(cardImage);
+    cardImageDiv.append(iconDiv);
+    //9
     var cardContentDiv = $("<div>");
     cardContentDiv.attr("class", "card-content");
     cardContentDiv.css({
@@ -98,19 +117,81 @@ function displayRecipes(recipes) {
       "background-color": "#f5f5f5",
     });
 
-    //8
+    //10
     var cardTitle = $("<span>");
     cardTitle.attr("class", "card-title");
     cardTitle.text(recipe.title);
-    
+
     cardContentDiv.append(cardTitle);
 
-    //9
+    //11
     var cardParapraph = $("<p>");
     cardParapraph.text(
-      " I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively."
+      " I am a very simple card. I am good at containing small bits of information."
     );
     cardContentDiv.append(cardParapraph);
+
+    //12
+    var contenDivSeparator1 = $("<div>");
+    contenDivSeparator1.attr("class", "timeServesIcons");
+
+    //13
+    var timerDiv = $("<div>");
+    contenDivSeparator1.append(timerDiv);
+    //14
+    var timerBtn = $("<a>");
+    timerBtn.attr(
+      "class",
+      "btn-floating waves-effect waves-light red accent-1"
+    );
+    var timerIcon = $("<i>");
+    timerIcon.attr("class", "material-icons");
+    timerIcon.text("schedule");
+    timerBtn.append(timerIcon);
+    timerDiv.append(timerBtn);
+
+    //15
+    var timerText = $("<p>");
+    timerText.text("Min");
+    timerDiv.append(timerText);
+
+    // 16
+    var servesDiv = $("<div>");
+
+    //17
+    var servestBtn = $("<a>");
+    servestBtn.attr(
+      "class",
+      "btn-floating waves-effect waves-light red accent-1"
+    );
+    var servesIcon = $("<i>");
+    servesIcon.attr("class", "material-icons");
+    servesIcon.text("restaurant");
+    servestBtn.append(servesIcon);
+    servesDiv.append(servestBtn);
+
+    //18
+    var servesText = $("<p>");
+    servesText.text("Serves");
+    servesDiv.append(servesText);
+    contenDivSeparator1.append(servesDiv);
+    cardContentDiv.append(contenDivSeparator1);
+
+    //19
+    var readMoreDiv = $("<div>");
+    readMoreDiv.css({
+      "padding-top": "15px",
+      "text-align": "center",
+    });
+    var readMoreBtn = $("<button>");
+    readMoreBtn.css("width", "100%");
+    readMoreBtn.attr({
+      class: "waves-effect waves-light btn-large",
+      id: "readMoreBtn",
+    });
+    readMoreBtn.text("Read More");
+    readMoreDiv.append(readMoreBtn);
+    cardContentDiv.append(readMoreDiv);
 
     mainCard.append(cardImageDiv);
     mainCard.append(cardContentDiv);
