@@ -1,6 +1,6 @@
 class Recipe {
     id = 0;
-    title = "";
+    name = "";
     image = "";
     servings = 0;
     prep = 0;
@@ -14,25 +14,57 @@ class Recipe {
         shrimp: false //Nothing explicitly stated for this
     };
 
+    // Standard constructor
+    constructor(id, attributes = {}) {
+        
+    }
+
     // This is a getter which functions as a placeholder for card output
     get template() {
         return `<div class="row" style="padding-left: 50px; padding-right: 50px">
         <div class="col s12 m6 l3">
-          <div class="card" style="border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; border-top-right-radius: 25px; border-top-left-radius: 25px;">
+          <div class="card recipe-card">
             <div class="card-image">
-              <img src="${this.image}" style="border-top-right-radius: 25px; border-top-left-radius: 25px;" alt="${this.title}" />
-              <a class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">read_more</i></a>
+              <img src="${this.image}" alt="${this.name}" />
+              <div class="recipe-card-badges">
+                <a class="btn-floating waves-effect waves-light red recipe-card-badge">
+                  <i class="material-icons">favorite</i></a>
+                <a class="btn-floating waves-effect waves-light red accent-1">
+                  <i class="material-icons">volume_up</i></a>
+              </div>
             </div>
-            <div class="card-content"
-              style="background-color: #f5f5f5; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
-              <span class="card-title">${this.title}</span>
+            <div class="card-content recipe-card-content">
+              <span class="card-title">${this.name}</span>
               <p>
                 ${this.description}
               </p>
+              <div class="recipe-card-details">
+                <div>
+                  <a
+                    class="btn-floating waves-effect waves-light red accent-1"
+                    ><i class="material-icons">schedule</i></a>
+                  <p>${this.prep}</p>
+                </div>
+                <div>
+                  <a
+                    class="btn-floating waves-effect waves-light red accent-1"
+                    ><i class="material-icons">restaurant</i></a>
+                  <p>${this.servings}</p>
+                </div>
+              </div>
+              <div style="padding-top: 15px; text-align: center">
+                <button
+                  style="width: 100%"
+                  class="waves-effect waves-light btn-large"
+                  id="readMoreBtn"
+                >
+                  Read More
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>`
+      </div>`;
     }
 }
 
