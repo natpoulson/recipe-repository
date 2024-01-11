@@ -12,23 +12,24 @@ function toggleModal() {
   instance.open();
 }
 
-const apiKey = "1ad7150895a748249f035aea5efa456f";
+const apiKey = "bee79d9ce47844eb8af55005e4664235";
 const searchInput = document.getElementById("search-input");
 const searchBtn = document.getElementById("searchBtn");
+var noRecipeFound = $("<div>");
 var card = $(".fcards");
 var alertdiv = $(".alert");
 
 function searchRecipes() {
   const query = searchInput.value;
   if (!query) {
-    alertdiv.text("Please enter a recipe  👨‍🍳");
-    alertdiv.css({
+    noRecipeFound.text("Please enter a recipe 👨‍🍳");
+    noRecipeFound.css({
       padding: "50px",
       "text-align": "center",
       "font-size": "30px",
       "font-family": "'Bree Serif', serif",
     });
-
+    card.append(noRecipeFound);
     return;
   }
   const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${query}&number=12`;
@@ -51,7 +52,7 @@ function displayRecipes(recipes) {
   var rowDiv1 = $("<div>");
   rowDiv1.attr("class", "row");
   rowDiv1.css("padding", "50px");
-
+  if (recipes.length !==0) {
   /* loop recipes results to display image and title */
   recipes.forEach((recipe) => {
     //1
@@ -196,10 +197,20 @@ function displayRecipes(recipes) {
     mainCard.append(cardImageDiv);
     mainCard.append(cardContentDiv);
   });
+}else {
+    noRecipeFound.text("No recipes found. 😥");
+    noRecipeFound.css({
+      padding: "50px",
+      "text-align": "center",
+      "font-size": "30px",
+      "font-family": "'Bree Serif', serif",
+    });
+    card.append(noRecipeFound);
+  }
 }
 
 searchBtn.addEventListener("click", function () {
   alertdiv.text("");
-  card.innerHTML = "";
+  card.html("");
   searchRecipes();
 });
