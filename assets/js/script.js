@@ -12,7 +12,7 @@ function toggleModal() {
   instance.open();
 }
 
-const apiKey = "1ad7150895a748249f035aea5efa456f";
+const apiKey = "bee79d9ce47844eb8af55005e4664235";
 const searchInput = document.getElementById("search-input");
 const searchBtn = document.getElementById("searchBtn");
 var noRecipeFound = $("<div>");

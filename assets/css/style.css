@@ -29,7 +29,8 @@ footer {
   background-color: #f0bebe27;
 }
 
-.search button, #readMoreBtn {
+.search button,
+#readMoreBtn {
   font-size: 16px;
   background: #ff9999f4;
   border-radius: 10px;
@@ -60,7 +61,7 @@ footer {
   justify-content: space-between;
   margin-top: 20px;
 }
-.favIconDiv{
+.favIconDiv {
   display: flex;
   justify-content: end;
   position: relative;
@@ -68,7 +69,31 @@ footer {
   bottom: 26px;
   float: right;
 }
+.recipe-card {
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+  border-top-right-radius: 25px;
+  border-top-left-radius: 25px;
+}
+.recipe-card-badges{
+  border-top-right-radius: 25px;
+  border-top-left-radius: 25px;
+}
 
+#recipe-card-content{
+  background-color: #f5f5f5;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+}
+
+.recipe-card-details{
+  display: flex;
+  justify-content: end;
+  position: relative;
+  right: 20px;
+  bottom: 26px;
+  float: right;
+}
 /* recipe.html custom css */
 .section {
   background-color: #fff;
