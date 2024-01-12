@@ -33,8 +33,9 @@
     </style>
     <link rel="stylesheet" href="./assets/css/style.css" />
   </head>
-  
+
   <body>
+    <!-- Navbar and slider section -->
     <section class="fnavbar">
       <nav class="nav-fixed">
         <div class="nav-wrapper">
@@ -68,7 +69,11 @@
       <div class="slider">
         <ul class="slides">
           <li>
-            <img class="navImg" src="./assets/images/nav-background1.png" alt="image one" />
+            <img
+              class="navImg"
+              src="./assets/images/nav-background1.png"
+              alt="image one"
+            />
             <div class="caption center-align white-text">
               <h4>Unleash the Epic Flavours in Your Kitchen</h4>
               <h5 class="light text-lighten-3">
@@ -92,56 +97,115 @@
         </ul>
       </div>
     </section>
-    <header style="text-align: center; margin-top: 20px">
-      <h1
-        style="color: #333; font-size: 40px; font-family: 'Bree Serif', serif"
-      >
-        Your Recipe Title
-      </h1>
-    </header>
 
-    <section class="section">
+    <!-- header -->
+    <header class="row RecipeTitleICon">
+      <div class="col">
+        <h1>Your Recipe Title</h1>
+      </div>
+      <div id="recipe-page-header" class="col">
+        <a class="btn-floating waves-effect waves-light red"
+          ><i class="material-icons">favorite</i></a
+        >
+        <a class="btn-floating waves-effect waves-light red accent-1"
+          ><i class="material-icons">volume_up</i></a
+        >
+      </div>
+    </header>
+    <!-- image/description section -->
+    <section class="row recipe-page-description">
       <img
         src="./assets/images/placeholder2.jpg"
-        width="500"
         alt="Recipe Image"
+        class="col s4"
+        height="300px"
       />
+
+      <div class="col s7 recipe-description-div">
+        <p style="text-align: center">
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quo
+          architecto quibusdam at et totam magnam delectus, atque consectetur
+          nihil nesciunt magni dolorum, harum fugiat dolore vel, officia sunt.
+          Ipsa quam eum illum rerum pariatur maiores nihil ea earum, voluptatem
+          recusandae.
+        </p>
+      </div>
+      <div
+        style="display: flex; align-items: center; padding-left: 10px"
+        class="col"
+      >
+        <div>
+          <div>
+            <a class="btn-floating waves-effect waves-light red accent-1"
+              ><i class="material-icons">schedule</i></a
+            >
+            <p>Min</p>
+          </div>
+          <div>
+            <a class="btn-floating waves-effect waves-light red accent-1"
+              ><i class="material-icons">restaurant</i></a
+            >
+            <p>Serves</p>
+          </div>
+        </div>
+      </div>
     </section>
-    <section class="section" id="preparation">
-      <h2 style="font-family: 'Bree Serif', serif">Preparation</h2>
-      <p>
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quo architecto
-        quibusdam at et totam magnam delectus, atque consectetur nihil nesciunt
-        magni dolorum, harum fugiat dolore vel, officia sunt. Ipsa quam eum
-        illum rerum pariatur maiores nihil ea earum, voluptatem recusandae.
-        Voluptatem, placeat cupiditate? Veniam nostrum perspiciatis eligendi
-        veritatis rerum dolorem quas asperiores nam sunt cum quibusdam modi
-        consequatur, totam officia ut? Quaerat eaque doloremque, aperiam
-        laboriosam soluta dicta laborum laudantium incidunt odit velit ratione
-        debitis, placeat consequatur tenetur repellendus error voluptate facilis
-        sint distinctio. Totam nam unde ad porro tenetur voluptates deleniti
-        aut? Quo rerum aliquid maiores ab. Necessitatibus, reprehenderit.
-      </p>
+
+    <!-- preparation/ingredients section -->
+    <section class="row" id="preparation">
+      <div
+        class="col s7"
+        id="prepDetails1"
+        style="margin-left: 10px; margin-bottom: 20px; margin-top: 20px"
+      >
+        <div class="prepIcon">
+          <a class="btn-floating waves-effect waves-light red accent-1"
+            ><i class="material-icons">volume_up</i></a
+          >
+        </div>
+        <div>
+          <p class="prep-ingredient-tiltle">Preparation</p>
+          <p>
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quo
+            architecto quibusdam at et totam magnam delectus, atque consectetur
+            nihil nesciunt magni dolorum, harum fugiat dolore vel, officia sunt.
+            Ipsa quam eum illum rerum pariatur maiores nihil ea earum,
+            voluptatem recusandae. Voluptatem, placeat cupiditate? Veniam
+            nostrum perspiciatis eligendi veritatis rerum dolorem quas
+            asperiores nam sunt cum quibusdam modi consequatur, totam officia
+            ut? Quaerat eaque doloremque, aperiam laboriosam soluta dicta
+            laborum laudantium incidunt odit velit ratione debitis, placeat
+            consequatur tenetur repellendus error voluptate facilis sint
+            distinctio. Totam nam unde ad porro tenetur voluptates deleniti aut?
+            Quo rerum aliquid maiores ab. Necessitatibus, reprehenderit.
+          </p>
+        </div>
+      </div>
+      <div class="col s5" id="prepDetails2">
+        <div class="prepIcon">
+          <a class="btn-floating waves-effect waves-light red accent-1"
+            ><i class="material-icons">volume_up</i></a
+          >
+        </div>
+        <div>
+          <p class="prep-ingredient-tiltle">Ingredients:</p>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum
+            libero doloremque voluptatem mollitia est fugiat eaque delectus
+            illum perspiciatis tempore facere labore corporis, eum numquam quas.
+            Eius blanditiis, consectetur deserunt doloremque sapiente esse
+            aspernatur eos fugiat delectus distinctio similique explicabo
+          </p>
+        </div>
+      </div>
     </section>
 
     <!-- Footer -->
-    <footer
-      class="page-footer"
-      style="margin-top: 100px; background-color: #ff9999"
-    >
+    <footer class="page-footer">
       <div class="container">
         <div class="row">
           <div class="col s12">
-            <h5
-              class="brand-logo black-text"
-              style="
-                font-weight: bold;
-                padding-bottom: 10px;
-                text-align: center;
-              "
-            >
-              Dish Delight
-            </h5>
+            <h5 class="brand-logo black-text">Dish Delight</h5>
           </div>
         </div>
       </div>
