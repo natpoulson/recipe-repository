@@ -90,52 +90,56 @@ footer {
 }
 
 /* STACEY WORK FOR FAVOURITE MODAL*/
-
-/* STACEY WORK FOR FAVOURITE MODAL */
 .favouritesCard {
+  font-family: 'july it', sans-serif;
   position: fixed;
   top: 0;
-  /*left: 100%;*/
-  left: calc(100% - 500px);
   width: 500px;
-  background-color: #9c0909;
+  background-color: #EAEAEA;
   height: 100vh;
-  transition: left 0.5s; /* Fix transition property */
+  left: 100%; /* Initially off-screen to the right */
+  transition: left 0.5s ease;
   z-index: 2;
+  border-radius: 20px 0 0 0;
+  overflow-y: auto;
+  box-shadow: 10px 10px black, 1em 0.4em;
 }
 
-.hidden {
-  display: none;
+.visible {
+  left: calc(100% - 500px); /* Slide in from the right */
 }
+
 
 .favouritesCard h2 {
-  color: aqua;
+  color: #000000;
   font-weight: 100;
   margin: 0;
-  padding: 0 20px;
-  height: 80px;
-  display: flex;
-  align-items: center;
+  text-align: center; /* Center the text */
+  line-height: 1.5; /* Adjust line height for better vertical centering */
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: #ffffff;
 }
 
 .favouritesCard .closeSidebar {
   position: absolute;
   bottom: 0;
   width: 100%;
-  display: grid;
+  display: flex;
+  justify-content: center; /* Center the button horizontally */
+  align-items: center; /* Center the button vertically */
   background-color: #ff9999;
   height: 70px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-weight: bold;
   cursor: pointer;
-}
-/*.active .favouritesCard {
-  left: calc(100% - 500px);
+  border: none;
+  color: white;
+  box-shadow: #000000;
 }
 
-/* Remove the stray comma in the next line */
-.active .container {
-  transform: translate(-200px);
+
+.closeSidebar:hover {
+  background-color: #2BBBAD;
 }
+
+

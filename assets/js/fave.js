@@ -1,30 +1,23 @@
-// Favourites functionality
-
 document.addEventListener('DOMContentLoaded', function(){
-    // Get the button element
-var closeButton = document.getElementById("closeButton");
-
-// Get the favouritesCard element
-var favouritesCard = document.querySelector(".favouritesCard");
-
-// Add a click event listener to the button
-closeButton.addEventListener("click", function() {
-  // Toggle the "hidden" class on favouritesCard
-  favouritesCard.classList.toggle("hidden");
-})
-})
-
-
-document.addEventListener('DOMContentLoaded', function(){
-    // Get the button element
-var fave = document.getElementById("fave");
-
-// Get the favouritesCard element
-var favouritesCard = document.querySelector(".favouritesCard");
-
-// Add a click event listener to the button
-fave.addEventListener("click", function() {
-  // Toggle the "hidden" class on favouritesCard
-  favouritesCard.classList.toggle("hidden");
-})
-})
+    var closeButton = document.getElementById("closeButton");
+    var fave = document.getElementById("fave");
+    var favouritesCard = document.querySelector(".favouritesCard");
+  
+    closeButton.addEventListener("click", function() {
+      // Remove the "visible" class to hide the sidebar
+      favouritesCard.classList.remove("visible");
+    });
+  
+    fave.addEventListener("click", function() {
+      // Toggle the "visible" class on favouritesCard
+      favouritesCard.classList.toggle("visible");
+  
+      // Adjust top and height based on scroll position
+      var navbarHeight = document.querySelector("nav").offsetHeight;
+      var scrollY = window.scrollY || document.documentElement.scrollTop;
+  
+      favouritesCard.style.top = navbarHeight + "px";
+      favouritesCard.style.height = "calc(100vh - " + navbarHeight + "px)";
+    });
+  });
+  
