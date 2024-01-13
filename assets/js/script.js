@@ -85,47 +85,45 @@ class Recipe {
 
   // Getters
   get resultCard() {
-      return `<div class="row" style="padding-left: 50px; padding-right: 50px">
-      <div class="col s12 m6 l3">
-        <div class="card recipe-card">
-          <div class="card-image">
-            <img src="${this.image}" alt="${this.name}" />
-            <div class="recipe-card-badges">
-              <a class="btn-floating waves-effect waves-light red recipe-card-badge">
-                <i class="material-icons">favorite</i></a>
+      return `<div class="col s12 m6 l3">
+      <div class="card recipe-card">
+        <div class="card-image">
+          <img class="recipe-card-badges" src="${this.image}" alt="${this.name}" />
+          <div class="recipe-card-details">
+            <a class="btn-floating waves-effect waves-light red">
+              <i class="material-icons">favorite</i>
+              </a>
+            <a class="btn-floating waves-effect waves-light red accent-1">
+              <i class="material-icons">volume_up</i>
+              </a>
+          </div>
+        </div>
+        <!-- Content -->
+        <div class="card-content recipe-card-content">
+          <span class="card-title">${this.name}</span>
+          <p>
+            ${this.description}
+          </p>
+          <div class="timeServesIcons">
+            <div>
               <a class="btn-floating waves-effect waves-light red accent-1">
-                <i class="material-icons">volume_up</i></a>
+                <i class="material-icons">schedule</i>
+              </a>
+              <p>${this.time} min</p>
+            </div>
+            <div>
+              <a class="btn-floating waves-effect waves-light red accent-1">
+                <i class="material-icons">restaurant</i>
+              </a>
+              <p>Serves ${this.servings}</p>
             </div>
           </div>
-          <div class="card-content recipe-card-content">
-            <span class="card-title">${this.name}</span>
-            <p>
-              ${this.description}
-            </p>
-            <div class="recipe-card-details">
-              <div>
-                <a
-                  class="btn-floating waves-effect waves-light red accent-1"
-                  ><i class="material-icons">schedule</i></a>
-                <p>${this.time}</p>
-              </div>
-              <div>
-                <a
-                  class="btn-floating waves-effect waves-light red accent-1"
-                  ><i class="material-icons">restaurant</i></a>
-                <p>${this.servings}</p>
-              </div>
-            </div>
-            <div style="padding-top: 15px; text-align: center">
-              <button
-                style="width: 100%"
-                class="waves-effect waves-light btn-large"
-                id="readMoreBtn">Read More</button>
-            </div>
+          <div class="read-more">
+            <button class="waves-effect waves-light btn-large" id="readMoreBtn" data-recipeId="${this.id}">Read more</button>
           </div>
         </div>
       </div>
-    </div>`;
+    </div>`
   }
 
   get favouriteCard() {
