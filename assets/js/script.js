@@ -36,9 +36,9 @@ class Recipe {
       this.image = properties['image'];
       this.description = properties['description'];
       this.servings = properties['servings'];
-      this.time = propertes['time'];
+      this.time = properties['time'];
       this.instructions = properties['instructions'];
-      this.ingredients = properies['ingredients'];
+      this.ingredients = properties['ingredients'];
       this.hasMeat = properties['hasMeat'];
       this.hasDairy = properties['hasDairy'];
       this.hasGluten = properties['hasGluten'];
@@ -164,15 +164,9 @@ class Recipe {
         throw new Error(resp.statusText);
       }
 
-      // Unpackage json response
+      // Process the results before they can be used
       const data = await resp.json();
-
-      // Clear any existing results and begin generating fresh results
-      Recipe.list = [];
-
-      for (const item of data.results) {
-        Recipe.list.push(new Recipe(item.id, item));
-      }
+      await Recipe.saveResults(data);
       return;
 
     } catch(err) {
@@ -182,7 +176,16 @@ class Recipe {
     }
   }
 
-  static showResultCards() {
+  static async saveResults(data) {
+      // Clear any existing results and begin generating fresh results
+      Recipe.list = [];
+
+      for (const item of data.results) {
+        Recipe.list.push(new Recipe(item.id, item));
+      }
+  }
+
+  static async showResultCards() {
     // Bind our search results section first and blank what's there.
     const results = $('#search-results');
     results.html('');
@@ -190,18 +193,19 @@ class Recipe {
     // Show no results found if the Recipe list is empty, then terminate the function.
     if (Recipe.list.length === 0) {
       results.html('<div class="msg-searchErr">No recipes found. 😥</div>');
-      return false;
+      return;
     }
 
     // Create new string containing the generated HTML concatenated for all recipes returned.
-    let formattedResults = '';
+    let formattedResults = '<div class="row">';
     for (const recipe of Recipe.list) {
       formattedResults += recipe.resultCard;
     }
+    formattedResults += '</div>';
 
     // Apply the results to the container
     results.html(formattedResults);
-    return true;
+    return;
   }
 }
  
@@ -237,7 +241,7 @@ function searchRecipes() {
 
   // Initiate a search query then display the results
   Recipe.search(query)
-    .then(Recipe.showResultCards())
+    .then(() => Recipe.showResultCards()) // Show the results after query processing only.
     .catch(() => {
       // An error splash in the event that we fail to receive a response from Spoonacular
       $('#search-results')
