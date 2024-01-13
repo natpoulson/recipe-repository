@@ -30,6 +30,7 @@ class Recipe {
       'source':'source'
     }
     // Handling in cases where importMode is enabled
+    // It assumes the data is 1-to-1
     if (importMode) {
       this.name = properties['name'];
       this.image = properties['image'];
@@ -126,6 +127,55 @@ class Recipe {
         </div>
       </div>
     </div>`;
+  }
+
+  // Static properties
+  static list = [];
+
+  // Static Methods
+  static async search(query, searchOpts = { limit:9, offset:0 }) {
+    // If passing searchOpts, make sure you specify a limit and offset
+    // Otherwise we'll inject the default values as a failover
+    if (!Object.keys(searchOpts).includes('limit')) {
+      searchOpts['limit'] = 9;
+    }
+    if (!Object.keys(searchOpts).includes('offset')) {
+      searchOpts['offset'] = 0;
+    }
+
+    try {
+      // Query Spoonacular
+      const resp = await fetch(`https://api.spoonacular.com/recipes/complexSearch?query=${query}&addRecipeInformation=true&number=${searchOpts.limit}&offset=${searchOpts.offset}`, {
+        method: "GET",
+        headers: {
+          // Replace this with your own API key if you want to test using your quotas
+          "x-api-key": "d6b7732ac8f6419095e86a0d96cc3570"
+        }
+      });
+
+      // Error handling for non-200 status codes
+      if (!resp.ok) {
+        throw new Error(resp.statusText);
+      }
+
+      // Unpackage json response
+      const data = await resp.json();
+
+      // Clear any existing results and begin generating fresh results
+      Recipe.list = [];
+
+      for (const item of data.results) {
+        Recipe.list += new Recipe(item.id, item);
+      }
+
+      // Return true when executed successfully
+      return true;
+
+    } catch(err) {
+      // Log the error message and return false to indicate search failure
+      console.error(err);
+      return false;
+    }
   }
 }
  
