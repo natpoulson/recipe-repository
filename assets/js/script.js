@@ -57,6 +57,31 @@ class Recipe {
       }
     }
 
+    /* 
+      Because it's potentially interesting I'll give you a breakdown:
+      Syntax for a RegEx string:
+        / / - Indicators of a RegEx string. You have to enter at least one character between for it to count as one or else it just becomes a single line comment
+        ^  - Matches from the first character in the string
+        (?:) - Indicates a group of characters - The ?: indicates that it shouldn't be captured, simply matched (Capturing means you can splice these in elsewhere using certain syntax)
+        . - Represents ANY single character
+        + - Match one or more of the preceding character (Note if you don't combine this with any other qualifiers this would match everything after it)
+        ? - Makes the previous modifier lazy (interrupt as soon as it encounters a character specified after it)
+        \. - Escaped full stop, prevents it from being read as a wildcard. You can use this on any other character that might otherwise be interpreted as a modifier, such as \? for a question mark
+        {} - Match the specified number of occurrences of the preceding character or group. You can use a single number to specify a match only if it repeats the exact number of times, or use two numbers separated by a comma to specify a range
+        
+        All together, the RegEx mask is searching for up to three complete sentences from the start using this combination.
+
+        You can learn more and experiment with RegEx using https://regexr.com
+    */
+    // Regex mask, captures the first sentence of the description
+    // In testing, everything past the second sentence tended to start delving into details that were overly redundant to the rest of the card.
+    const descSentenceMask = /^(?:.+?\.){1}/;
+    // Mask for removing the <b> tags.
+    const descHTMLMask = /(\<\/?b\>)/gi;
+    // Truncate to 1 sentence then remove any instances of <b> or </b> tags
+    this.description = this.description.match(descSentenceMask);
+    this.description = String(this.description).replace(descHTMLMask, '');
+
     // Ensure the object being passed has instructions
     if (Object.keys(properties).includes('analyzedInstructions')) {
       // Extract the steps for processing
@@ -85,15 +110,15 @@ class Recipe {
 
   // Getters
   get resultCard() {
-      return `<div class="col s12 m6 l3">
+      return `<div class="col s12 m6 l4">
       <div class="card recipe-card">
         <div class="card-image">
           <img class="recipe-card-badges" src="${this.image}" alt="${this.name}" />
           <div class="recipe-card-details">
-            <a class="btn-floating waves-effect waves-light red">
+            <a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red">
               <i class="material-icons">favorite</i>
               </a>
-            <a class="btn-floating waves-effect waves-light red accent-1">
+            <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1">
               <i class="material-icons">volume_up</i>
               </a>
           </div>
@@ -115,7 +140,7 @@ class Recipe {
               <a class="btn-floating waves-effect waves-light red accent-1">
                 <i class="material-icons">restaurant</i>
               </a>
-              <p>Serves ${this.servings}</p>
+              <p>${this.servings} serve${this.servings > 1 ? 's' : ''}</p>
             </div>
           </div>
           <div class="read-more">
