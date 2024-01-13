@@ -75,14 +75,14 @@ class Recipe {
       });
     }
     
-    // Invert the values of the booleans, since spoonacular's keys are inversions
+    // Invert the values of the booleans, since spoonacular's keys are inversions of what we want
     this.hasMeat = !this.hasMeat;
     this.hasDairy = !this.hasDairy;
     this.hasGluten = !this.hasGluten;
   }
 
   // Getters
-  get template() {
+  get resultCard() {
       return `<div class="row" style="padding-left: 50px; padding-right: 50px">
       <div class="col s12 m6 l3">
         <div class="card recipe-card">
@@ -177,6 +177,28 @@ class Recipe {
       return false;
     }
   }
+
+  static showResultCards() {
+    // Bind our search results section first and blank what's there.
+    const results = $('#search-results');
+    results.text('');
+
+    // Show no results found if the Recipe list is empty, then terminate the function.
+    if (Recipe.list.length === 0) {
+      results.text('<div class="msg-noResults">No recipes found. 😥</div>');
+      return false;
+    }
+
+    // Create new string containing the generated HTML concatenated for all recipes returned.
+    let formattedResults = '';
+    for (const recipe in Recipe.list) {
+      formattedResults += recipe.resultCard;
+    }
+
+    // Apply the results to the container
+    results.text(formattedResults);
+    return true;
+  }
 }
  
 /* initiate materialize */
@@ -213,182 +235,186 @@ function searchRecipes() {
     card.append(noRecipeFound);
     return;
   }
-  const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${query}&number=12`;
 
-  fetch(apiUrl)
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (data) {
-      console.log(data);
-      displayRecipes(data.results);
-    })
-    .catch((error) => console.error("Error fetching recipes:", error));
+  Recipe.search(query);
+  Recipe.showResultCards();
+
+  // const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${query}&number=12`;
+
+  // fetch(apiUrl)
+  //   .then(function (response) {
+  //     return response.json();
+  //   })
+  //   .then(function (data) {
+  //     console.log(data);
+  //     displayRecipes(data.resuts);
+  //   })
+  //   .catch((error) => console.error("Error fetching recipes:", error));
 }
 
 /* Function to display the recipe card */
-function displayRecipes(recipes) {
-  console.log(recipes);
-  var card = $(".fcards");
-  var rowDiv1 = $("<div>");
-  rowDiv1.attr("class", "row");
-  rowDiv1.css("padding", "50px");
-  if (recipes.length !==0) {
-  /* loop recipes results to display image and title */
-  recipes.forEach((recipe) => {
-    //1
-    card.append(rowDiv1);
-    //2
-    var scndDiv = $("<div>");
-    scndDiv.attr("class", "col s12 m6 l3");
-    rowDiv1.append(scndDiv);
-    //3
-    var mainCard = $("<div>");
-    mainCard.attr("class", "card");
-    mainCard.css({
-      "border-bottom-left-radius": "25px",
-      "border-bottom-right-radius": "25px",
-      "border-top-right-radius": "25px",
-      "border-top-left-radius": "25px",
-    });
-    scndDiv.append(mainCard);
-    //4
-    var cardImageDiv = $("<div>");
-    cardImageDiv.attr("class", "card-image");
+// function displayRecipes(recipes) {
+//   console.log(recipes);
+//   var card = $(".fcards");
+//   var rowDiv1 = $("<div>");
+//   rowDiv1.attr("class", "row");
+//   rowDiv1.css("padding", "50px");
+//   if (recipes.length !==0) {
+//   /* loop recipes results to display image and title */
+//   recipes.forEach((recipe) => {
+//     //1
+//     card.append(rowDiv1);
+//     //2
+//     var scndDiv = $("<div>");
+//     scndDiv.attr("class", "col s12 m6 l3");
+//     rowDiv1.append(scndDiv);
+//     //3
+//     var mainCard = $("<div>");
+//     mainCard.attr("class", "card");
+//     mainCard.css({
+//       "border-bottom-left-radius": "25px",
+//       "border-bottom-right-radius": "25px",
+//       "border-top-right-radius": "25px",
+//       "border-top-left-radius": "25px",
+//     });
+//     scndDiv.append(mainCard);
+//     //4
+//     var cardImageDiv = $("<div>");
+//     cardImageDiv.attr("class", "card-image");
 
-    //5
-    var cardImage = $("<img>");
-    cardImage.attr("src", recipe.image);
-    cardImage.css({
-      "border-top-right-radius": "25px",
-      "border-top-left-radius": "25px",
-    });
+//     //5
+//     var cardImage = $("<img>");
+//     cardImage.attr("src", recipe.image);
+//     cardImage.css({
+//       "border-top-right-radius": "25px",
+//       "border-top-left-radius": "25px",
+//     });
 
-    //6
-    var iconDiv = $("<div>");
-    iconDiv.attr("class", "favIconDiv");
-    //7
-    var cardImageBtn1 = $("<a>");
-    cardImageBtn1.css("margin-right", "12px");
-    cardImageBtn1.attr("class", "btn-floating waves-effect waves-light red");
-    var favIcon1 = $("<i>");
-    favIcon1.attr("class", "material-icons");
-    favIcon1.text("favorite");
-    cardImageBtn1.append(favIcon1);
-    //8
-    var cardImageBtn2 = $("<a>");
-    cardImageBtn2.attr(
-      "class",
-      "btn-floating waves-effect waves-light red accent-1"
-    );
-    var favIcon2 = $("<i>");
-    favIcon2.attr("class", "material-icons");
-    favIcon2.text("volume_up");
-    cardImageBtn2.append(favIcon2);
+//     //6
+//     var iconDiv = $("<div>");
+//     iconDiv.attr("class", "favIconDiv");
+//     //7
+//     var cardImageBtn1 = $("<a>");
+//     cardImageBtn1.css("margin-right", "12px");
+//     cardImageBtn1.attr("class", "btn-floating waves-effect waves-light red");
+//     var favIcon1 = $("<i>");
+//     favIcon1.attr("class", "material-icons");
+//     favIcon1.text("favorite");
+//     cardImageBtn1.append(favIcon1);
+//     //8
+//     var cardImageBtn2 = $("<a>");
+//     cardImageBtn2.attr(
+//       "class",
+//       "btn-floating waves-effect waves-light red accent-1"
+//     );
+//     var favIcon2 = $("<i>");
+//     favIcon2.attr("class", "material-icons");
+//     favIcon2.text("volume_up");
+//     cardImageBtn2.append(favIcon2);
 
-    iconDiv.append(cardImageBtn1);
-    iconDiv.append(cardImageBtn2);
-    cardImageDiv.append(cardImage);
-    cardImageDiv.append(iconDiv);
-    //9
-    var cardContentDiv = $("<div>");
-    cardContentDiv.attr("class", "card-content");
-    cardContentDiv.css({
-      "border-bottom-left-radius": "25px",
-      "border-bottom-right-radius": "25px",
-      "background-color": "#f5f5f5",
-    });
+//     iconDiv.append(cardImageBtn1);
+//     iconDiv.append(cardImageBtn2);
+//     cardImageDiv.append(cardImage);
+//     cardImageDiv.append(iconDiv);
+//     //9
+//     var cardContentDiv = $("<div>");
+//     cardContentDiv.attr("class", "card-content");
+//     cardContentDiv.css({
+//       "border-bottom-left-radius": "25px",
+//       "border-bottom-right-radius": "25px",
+//       "background-color": "#f5f5f5",
+//     });
 
-    //10
-    var cardTitle = $("<span>");
-    cardTitle.attr("class", "card-title");
-    cardTitle.text(recipe.title);
+//     //10
+//     var cardTitle = $("<span>");
+//     cardTitle.attr("class", "card-title");
+//     cardTitle.text(recipe.title);
 
-    cardContentDiv.append(cardTitle);
+//     cardContentDiv.append(cardTitle);
 
-    //11
-    var cardParapraph = $("<p>");
-    cardParapraph.text(
-      " I am a very simple card. I am good at containing small bits of information."
-    );
-    cardContentDiv.append(cardParapraph);
+//     //11
+//     var cardParapraph = $("<p>");
+//     cardParapraph.text(
+//       " I am a very simple card. I am good at containing small bits of information."
+//     );
+//     cardContentDiv.append(cardParapraph);
 
-    //12
-    var contenDivSeparator1 = $("<div>");
-    contenDivSeparator1.attr("class", "timeServesIcons");
+//     //12
+//     var contenDivSeparator1 = $("<div>");
+//     contenDivSeparator1.attr("class", "timeServesIcons");
 
-    //13
-    var timerDiv = $("<div>");
-    contenDivSeparator1.append(timerDiv);
-    //14
-    var timerBtn = $("<a>");
-    timerBtn.attr(
-      "class",
-      "btn-floating waves-effect waves-light red accent-1"
-    );
-    var timerIcon = $("<i>");
-    timerIcon.attr("class", "material-icons");
-    timerIcon.text("schedule");
-    timerBtn.append(timerIcon);
-    timerDiv.append(timerBtn);
+//     //13
+//     var timerDiv = $("<div>");
+//     contenDivSeparator1.append(timerDiv);
+//     //14
+//     var timerBtn = $("<a>");
+//     timerBtn.attr(
+//       "class",
+//       "btn-floating waves-effect waves-light red accent-1"
+//     );
+//     var timerIcon = $("<i>");
+//     timerIcon.attr("class", "material-icons");
+//     timerIcon.text("schedule");
+//     timerBtn.append(timerIcon);
+//     timerDiv.append(timerBtn);
 
-    //15
-    var timerText = $("<p>");
-    timerText.text("Min");
-    timerDiv.append(timerText);
+//     //15
+//     var timerText = $("<p>");
+//     timerText.text("Min");
+//     timerDiv.append(timerText);
 
-    // 16
-    var servesDiv = $("<div>");
+//     // 16
+//     var servesDiv = $("<div>");
 
-    //17
-    var servestBtn = $("<a>");
-    servestBtn.attr(
-      "class",
-      "btn-floating waves-effect waves-light red accent-1"
-    );
-    var servesIcon = $("<i>");
-    servesIcon.attr("class", "material-icons");
-    servesIcon.text("restaurant");
-    servestBtn.append(servesIcon);
-    servesDiv.append(servestBtn);
+//     //17
+//     var servestBtn = $("<a>");
+//     servestBtn.attr(
+//       "class",
+//       "btn-floating waves-effect waves-light red accent-1"
+//     );
+//     var servesIcon = $("<i>");
+//     servesIcon.attr("class", "material-icons");
+//     servesIcon.text("restaurant");
+//     servestBtn.append(servesIcon);
+//     servesDiv.append(servestBtn);
 
-    //18
-    var servesText = $("<p>");
-    servesText.text("Serves");
-    servesDiv.append(servesText);
-    contenDivSeparator1.append(servesDiv);
-    cardContentDiv.append(contenDivSeparator1);
+//     //18
+//     var servesText = $("<p>");
+//     servesText.text("Serves");
+//     servesDiv.append(servesText);
+//     contenDivSeparator1.append(servesDiv);
+//     cardContentDiv.append(contenDivSeparator1);
 
-    //19
-    var readMoreDiv = $("<div>");
-    readMoreDiv.css({
-      "padding-top": "15px",
-      "text-align": "center",
-    });
-    var readMoreBtn = $("<button>");
-    readMoreBtn.css("width", "100%");
-    readMoreBtn.attr({
-      class: "waves-effect waves-light btn-large",
-      id: "readMoreBtn",
-    });
-    readMoreBtn.text("Read More");
-    readMoreDiv.append(readMoreBtn);
-    cardContentDiv.append(readMoreDiv);
+//     //19
+//     var readMoreDiv = $("<div>");
+//     readMoreDiv.css({
+//       "padding-top": "15px",
+//       "text-align": "center",
+//     });
+//     var readMoreBtn = $("<button>");
+//     readMoreBtn.css("width", "100%");
+//     readMoreBtn.attr({
+//       class: "waves-effect waves-light btn-large",
+//       id: "readMoreBtn",
+//     });
+//     readMoreBtn.text("Read More");
+//     readMoreDiv.append(readMoreBtn);
+//     cardContentDiv.append(readMoreDiv);
 
-    mainCard.append(cardImageDiv);
-    mainCard.append(cardContentDiv);
-  });
-}else {
-    noRecipeFound.text("No recipes found. 😥");
-    noRecipeFound.css({
-      padding: "50px",
-      "text-align": "center",
-      "font-size": "30px",
-      "font-family": "'Bree Serif', serif",
-    });
-    card.append(noRecipeFound);
-  }
-}
+//     mainCard.append(cardImageDiv);
+//     mainCard.append(cardContentDiv);
+//   });
+// }else {
+//     noRecipeFound.text("No recipes found. 😥");
+//     noRecipeFound.css({
+//       padding: "50px",
+//       "text-align": "center",
+//       "font-size": "30px",
+//       "font-family": "'Bree Serif', serif",
+//     });
+//     card.append(noRecipeFound);
+//   }
+// }
 
 searchBtn.addEventListener("click", function () {
   alertdiv.text("");
