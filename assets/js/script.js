@@ -115,10 +115,10 @@ class Recipe {
         <div class="card-image">
           <img class="recipe-card-badges" src="${this.image}" alt="${this.name}" />
           <div class="recipe-card-details">
-            <a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red">
+            <a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red" onclick="">
               <i class="material-icons">favorite</i>
               </a>
-            <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1">
+            <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1" onclick="">
               <i class="material-icons">volume_up</i>
               </a>
           </div>
