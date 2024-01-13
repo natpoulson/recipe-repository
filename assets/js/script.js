@@ -130,14 +130,19 @@ class Recipe {
   }
 
   // Static properties
-  static list = [];
+  static list = []; // Recipes handled from search results are stored here
+  static favourites = []; // Saved recipes in memory to be stored here
+  static config = { // Add any configurable values here for reuse where needed
+    searchLimit: 9,
+    apiKey: "d6b7732ac8f6419095e86a0d96cc3570"
+  }
 
   // Static Methods
-  static async search(query, searchOpts = { limit:9, offset:0 }) {
+  static async search(query, searchOpts = { limit:Recipe.config.searchLimit, offset:0 }) {
     // If passing searchOpts, make sure you specify a limit and offset
     // Otherwise we'll inject the default values as a failover
     if (!Object.keys(searchOpts).includes('limit')) {
-      searchOpts['limit'] = 9;
+      searchOpts['limit'] = Recipe.config.searchLimit;
     }
     if (!Object.keys(searchOpts).includes('offset')) {
       searchOpts['offset'] = 0;
@@ -149,7 +154,7 @@ class Recipe {
         method: "GET",
         headers: {
           // Replace this with your own API key if you want to test using your quotas
-          "x-api-key": "d6b7732ac8f6419095e86a0d96cc3570"
+          "x-api-key": Recipe.config.apiKey
         }
       });
 
