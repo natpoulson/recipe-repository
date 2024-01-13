@@ -60,19 +60,21 @@ class Recipe {
     // Ensure the object being passed has instructions
     if (Object.keys(properties).includes('analyzedInstructions')) {
       // Extract the steps for processing
-      for (const instruction of properties['analyzedInstructions']['steps']) {
+      // The [0] is utterly asinine, but that's because of the way Spoonacular returns it
+      // "Yes, a breakdown of the instructions should start with an array with a single element, which contains the object detailing the actual steps. I am a programmer :)"
+      for (const instruction of properties['analyzedInstructions'][0]['steps']) {
         // Create a temporary object to synthesise a 'step', since we can't directly create an object with that property
         const newInstruction = {};
         // Inject a step in the format { '0':'Preheat oven to 200F' }
         // This is so we can keep track of the step count using the key when sorting the array
         newInstruction[instruction['number']] = instruction['step'];
         // Push the sysnthesised object to the instructions array
-        this.instructions.push(newInstruction);
+        this.instructions.push(Object(newInstruction));
       }
       // Sort in ascending order by comparing the extracted values of the steps
-      this.instructions.sort((a, b) => {
-        return Object.values(a)[0] < Object.values(b)[0];
-      });
+      // this.instructions.sort((a, b) => {
+      //   return Object.values(a)[0] < Object.values(b)[0];
+      // });
     }
     
     // Invert the values of the booleans, since spoonacular's keys are inversions of what we want
@@ -170,38 +172,36 @@ class Recipe {
       Recipe.list = [];
 
       for (const item of data.results) {
-        Recipe.list += new Recipe(item.id, item);
+        Recipe.list.push(new Recipe(item.id, item));
       }
-
-      // Return true when executed successfully
-      return true;
+      return;
 
     } catch(err) {
-      // Log the error message and return false to indicate search failure
+      // Log the error message
       console.error(err);
-      return false;
+      return;
     }
   }
 
   static showResultCards() {
     // Bind our search results section first and blank what's there.
     const results = $('#search-results');
-    results.text('');
+    results.html('');
 
     // Show no results found if the Recipe list is empty, then terminate the function.
     if (Recipe.list.length === 0) {
-      results.text('<div class="msg-noResults">No recipes found. 😥</div>');
+      results.html('<div class="msg-noResults">No recipes found. 😥</div>');
       return false;
     }
 
     // Create new string containing the generated HTML concatenated for all recipes returned.
     let formattedResults = '';
-    for (const recipe in Recipe.list) {
+    for (const recipe of Recipe.list) {
       formattedResults += recipe.resultCard;
     }
 
     // Apply the results to the container
-    results.text(formattedResults);
+    results.html(formattedResults);
     return true;
   }
 }
@@ -241,8 +241,8 @@ function searchRecipes() {
     return;
   }
 
-  Recipe.search(query);
-  Recipe.showResultCards();
+  Recipe.search(query)
+    .then(Recipe.showResultCards());
 
   // const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${query}&number=12`;
 
