@@ -163,3 +163,58 @@ padding: 20px;
   background-color: #f2f2f2;
   border-radius: 50px;
 }
+
+/* STACEY WORK FOR FAVOURITE MODAL*/
+.favouritesCard {
+  font-family: 'july it', sans-serif;
+  position: fixed;
+  top: 0;
+  width: 500px;
+  background-color: #EAEAEA;
+  height: 100vh;
+  left: 100%; /* Initially off-screen to the right */
+  transition: left 0.5s ease;
+  z-index: 2;
+  border-radius: 20px 0 0 0;
+  overflow-y: auto;
+  box-shadow: 10px 10px black, 1em 0.4em;
+}
+
+.visible {
+  left: calc(100% - 500px); /* Slide in from the right */
+}
+
+
+.favouritesCard h2 {
+  color: #000000;
+  font-weight: 100;
+  margin: 0;
+  text-align: center; /* Center the text */
+  line-height: 1.5; /* Adjust line height for better vertical centering */
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: #ffffff;
+}
+
+.favouritesCard .closeSidebar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Center the button horizontally */
+  align-items: center; /* Center the button vertically */
+  background-color: #ff9999;
+  height: 70px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  color: white;
+  box-shadow: #000000;
+}
+
+
+.closeSidebar:hover {
+  background-color: #2BBBAD;
+}
+
+
