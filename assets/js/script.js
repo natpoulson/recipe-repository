@@ -158,6 +158,7 @@ class Recipe {
   // Static properties
   static list = []; // Recipes handled from search results are stored here
   static favourites = []; // Saved recipes in memory to be stored here
+  static active = {}; // Recipe currently being viewed
   static config = { // Add any configurable values here for reuse where needed
     searchLimit: 9,
     apiKey: "d6b7732ac8f6419095e86a0d96cc3570"
@@ -251,34 +252,66 @@ class Narrator {
   }
 
   static parse(event) {
-    // Stop bubbling and default anchor behaviour
-    event.preventDefault();
-    event.stopPropagation();
+    try {
+      // Stop bubbling and default anchor behaviour
+      event.preventDefault();
+      event.stopPropagation();
 
-    // Extract the parse type and recipe ID from the narration element
-    const type = event.currentTarget.dataset['type'];
-    const recipeId = event.currentTarget.dataset['recipe-id'];
+      // Extract the parse type and recipe ID from the narration element
+      const type = event.currentTarget.dataset['type'];
+      let recipeId;
 
-    // Retrieve the recipe from the current dataset
-    // Need to add handling based on type since we can only rely on the list when searching. Different contexts exist for Favourites and Ingredients/Instructions.
-    const recipe = Recipe.list.find(a => {
-      a.id === recipeId;
-    });
+      // Retrieve the recipe from the current dataset
+      // Need to add handling based on type since we can only rely on the list when searching. Different contexts exist for Favourites and Ingredients/Instructions.
+      let recipe;
 
-    // Initialise the string we'll be passing to the read method
-    let dialogue;
+      switch (type) {
+        case Narrator.type.RECIPE_CARD:
+          recipeId = event.currentTarget.dataset['recipe-id'];
+          recipe = Recipe.list.find(a => {
+            a.id === recipeId;
+          });
+          break;
+        case Narrator.type.RECIPE_FAV_CARD:
+          recipeId = event.currentTarget.dataset['recipe-id'];
+          recipe = Recipe.favourites.find(a => {
+            a.id === recipeId;
+          });
+          break;
+        case Narrator.type.RECIPE_INGREDIENTS:
+        case Narrator.type.RECIPE_INSTRUCTIONS:
+          recipe = Recipe.active;
+          break;
+        default:
+          throw new Error("No valid type detected");
+      }
 
-    // Identify what type of text to pass to the read function and format appropriately.
-    switch (type) {
-      case Narrator.type.RECIPE_CARD:
-        dialogue = `${recipe.name}. Serves ${recipe.servings > 0 ? recipe.servings : 'an unspecified number of'} people, and ready in ${recipe.time > 0 ? recipe.time : 'an unspecified number of'} minutes. ${recipe.description}.`;
-        break;
-      default:
-        dialogue = "Sorry, we could not interpret the text provided. Please try again.";
-        break;
+      // Initialise the string we'll be passing to the read method
+      let dialogue = "";
+
+      // Identify what type of text to pass to the read function and format appropriately.
+      switch (type) {
+        case Narrator.type.RECIPE_CARD:
+          dialogue = `${recipe.name}. Serves ${recipe.servings > 0 ? recipe.servings : 'an unspecified number of'} people, and ready in ${recipe.time > 0 ? recipe.time : 'an unspecified number of'} minutes. ${recipe.description}.`;
+          break;
+        case Narrator.type.RECIPE_INSTRUCTIONS:
+          // Extract each step and parse as text, include a new line at the end
+          for (const step of recipe.instructions) {
+            dialogue += `Step ${Object.keys(step)[0]}. ${Object.values(step)[0]}.\n`;
+          }
+          // Remove the final new line character
+          dialogue = dialogue.replace(/\n$/g, '');
+          break;
+        case Narrator.type.RECIPE_INGREDIENTS:
+          // TODO: Extract the ingredients
+          dialogue = "Placeholder";
+          break;
+      }
+
+      Narrator.read(dialogue);
+    } catch(err){
+      console.error(err);
     }
-
-    Narrator.read(dialogue);
   }
 
   static async read(text) {
