@@ -91,6 +91,7 @@
       </div>
     </section>
 
+    
  <!-- STACEY MAKING NOTES & SECTIONS FOR FAVOURITES MENU TO APPEAR ---------------------------------->
 
  <section>
@@ -152,17 +153,6 @@
   <!-- STACEY END OF WORK Favourites Sidebar--------------------------------------------------------------------------->
 
 
-
-
-
-
-
-
-
-
-
-
-
     <!-- Website description section -->
     <section class="description">
       <div class="section white center">
@@ -210,31 +200,23 @@
     </section>
 
     <!--Recipe Cards section -->
-    <section class="fcards">
-      <div class="row" style="padding-left: 50px; padding-right: 50px">
+    <section id="search-results" class="fcards">
+      <div class="row">
         <div class="col s12 m6 l3">
-          <div class="card recipe-card" id="staticRecipe">
-            <div class="card-image id="cardImage">
-              <!--  -->
-              <img
-                class="recipe-card-badges"
-                src="./assets/images/nav-background1.png"
-                style="border-top-right-radius: 15px; border-top-left-radius: 15px;"
-                alt=""
-              />
-
+          <div class="card recipe-card">
+            <div class="card-image">
+              <!-- Image/badges -->
+              <img class="recipe-card-badges" src="./assets/images/nav-background1.png" alt="" />
               <div class="recipe-card-details">
-                <a
-                  style="margin-right: 12px"
-                  class="btn-floating waves-effect waves-light red"
-                  ><i class="material-icons" id="favoritesIcon">favorite</i></a
-                >
-                <a class="btn-floating waves-effect waves-light red accent-1"
-                  ><i class="material-icons">volume_up</i></a
-                >
+                <a class="btn-floating waves-effect waves-light red">
+                  <i class="material-icons">favorite</i>
+                  </a>
+                <a class="btn-floating waves-effect waves-light red accent-1">
+                  <i class="material-icons">volume_up</i>
+                  </a>
               </div>
             </div>
-            <!--  -->
+            <!-- Content -->
             <div class="card-content recipe-card-content">
               <span class="card-title">Recipe Title</span>
               <p>
@@ -243,26 +225,20 @@
               </p>
               <div class="timeServesIcons" id="timeServed">
                 <div>
-                  <a class="btn-floating waves-effect waves-light red accent-1"
-                    ><i class="material-icons">schedule</i></a
-                  >
+                  <a class="btn-floating waves-effect waves-light red accent-1">
+                    <i class="material-icons">schedule</i>
+                  </a>
                   <p>Min</p>
                 </div>
                 <div>
-                  <a class="btn-floating waves-effect waves-light red accent-1"
-                    ><i class="material-icons">restaurant</i></a
-                  >
+                  <a class="btn-floating waves-effect waves-light red accent-1">
+                    <i class="material-icons">restaurant</i>
+                  </a>
                   <p>Serves</p>
                 </div>
               </div>
-              <div style="padding-top: 15px; text-align: center">
-                <button
-                  style="width: 100%"
-                  class="waves-effect waves-light btn-large"
-                  id="readMoreBtn"
-                >
-                  Read more
-                </button>
+              <div class="read-more">
+                <button class="waves-effect waves-light btn-large" id="readMoreBtn">Read more</button>
               </div>
             </div>
           </div>
