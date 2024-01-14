@@ -24,9 +24,6 @@ class Recipe {
       'description':'summary',
       'servings':'servings',
       'time':'readyInMinutes',
-      'hasMeat':'vegetarian',
-      'hasDairy':'dairyFree',
-      'hasGluten':'glutenFree',
       'source':'source'
     }
     // Handling in cases where importMode is enabled
@@ -39,9 +36,6 @@ class Recipe {
       this.time = properties['time'];
       this.instructions = properties['instructions'];
       this.ingredients = properties['ingredients'];
-      this.hasMeat = properties['hasMeat'];
-      this.hasDairy = properties['hasDairy'];
-      this.hasGluten = properties['hasGluten'];
       this.source = properties['source'];
       return;
     }
@@ -84,9 +78,9 @@ class Recipe {
       // Dictionary of regex patterns and substitutions for cleaning instruction text for parsing.
       const sanitisers = [
         {
-          // Replace ampersands with HTML-safe versions
+          // Replace ampersands with just the word to avoid accidentally breaking the query string
           pattern: /&/,
-          substitution: '&amp;'
+          substitution: 'and'
         },
         {
           // Remove any leading numbers
@@ -101,7 +95,7 @@ class Recipe {
         {
           // Create space between full stop and next word
           // This would break URLs but these are instructions, they shouldn't have those.
-          pattern: /\.(?!\s|\d|$)/,
+          pattern: /\.(?=[A-Za-z])/,
           substitution: '. '
         }
       ];
@@ -114,7 +108,7 @@ class Recipe {
         // Inject a step in the format { '0':'Preheat oven to 200F' }
         // This is so we can keep track of the step count using the key when sorting the array
         let cleanedInstruction = instruction['step'];
-        for (const sanitiser in sanitisers) {
+        for (const sanitiser of sanitisers) {
           // Iterate through all sanitisers and apply to the instruction
           cleanedInstruction = cleanedInstruction.replace(sanitiser.pattern, sanitiser.substitution);
           // Run a quick regex on the end to see if there's no full stop, add one if that's the case
@@ -126,16 +120,8 @@ class Recipe {
         // Push the sysnthesised object to the instructions array
         this.instructions.push(Object(newInstruction));
       }
-      // Sort in ascending order by comparing the extracted values of the steps
-      // this.instructions.sort((a, b) => {
-      //   return Object.values(a)[0] < Object.values(b)[0];
-      // });
     }
     
-    // Invert the values of the booleans, since spoonacular's keys are inversions of what we want
-    this.hasMeat = !this.hasMeat;
-    this.hasDairy = !this.hasDairy;
-    this.hasGluten = !this.hasGluten;
   }
 
   // Getters
@@ -184,7 +170,7 @@ class Recipe {
           </div>
         </div>
       </div>
-    </div>`
+    </div>`;
   }
 
   get favouriteCard() {
@@ -243,7 +229,7 @@ class Recipe {
         </ul>
       </div>
     </div>
-  </section>`; // HTML Snippet for a result page
+  </section>`;
   }
 
   get formattedIngredients() {
@@ -258,7 +244,7 @@ class Recipe {
   get formattedInstructions() {
     let output = "";
     for (const item of this.instructions) {
-      output +=  `<li>${Object.values(item)[0]}</li>\n`;
+      output += `<li>${Object.values(item)[0]}</li>\n`;
     }
     output.replace(/\n$/g, '');
     return output;
@@ -274,19 +260,10 @@ class Recipe {
   }
 
   // Static Methods
-  static async search(query, searchOpts = { limit:Recipe.config.searchLimit, offset:0 }) {
-    // If passing searchOpts, make sure you specify a limit and offset
-    // Otherwise we'll inject the default values as a failover
-    if (!Object.keys(searchOpts).includes('limit')) {
-      searchOpts['limit'] = Recipe.config.searchLimit;
-    }
-    if (!Object.keys(searchOpts).includes('offset')) {
-      searchOpts['offset'] = 0;
-    }
-
+  static async search(query, offset = 0) {
     try {
       // Query Spoonacular
-      const resp = await fetch(`https://api.spoonacular.com/recipes/complexSearch?query=${query}&addRecipeInformation=true&number=${searchOpts.limit}&offset=${searchOpts.offset}`, {
+      const resp = await fetch(`https://api.spoonacular.com/recipes/complexSearch?query=${query}&addRecipeInformation=true&number=${Recipe.config.searchLimit}&offset=${offset}`, {
         method: "GET",
         headers: {
           // Replace this with your own API key if you want to test using your quotas
@@ -347,8 +324,8 @@ class Recipe {
       // Unpack the ingredients and store to a new object we'll add to the ingredients array
       for (const ingredient of data.ingredients) {
         const newIngredient = {
-          quantity: ingredient['amount']['metric']['value'],
-          unit: String(ingredient['amount']['metric']['unit']).replace(/s$/, ''), // Removing plural measure notations
+          quantity: Number(Number(ingredient['amount']['metric']['value']).toFixed(2)),
+          unit: String(ingredient['amount']['metric']['unit']).replace(/s$/, '').toLowerCase(), // Removing plural measure notations
           name: ingredient['name']
         };
         newRecipe.ingredients.push(newIngredient);
@@ -527,7 +504,7 @@ class Narrator {
         case Narrator.type.RECIPE_INGREDIENTS:
           // TODO: Add method for populating ingredients with quantity, unit, and name values
           for (const ingredient of recipe.ingredients) {
-            dialogue += `${ingredient.quantity} ${Narrator.articulatedUnit(ingredient.unit)}${pluralise(ingredient.quantity)}; ${ingredient.name}. \n`;
+            dialogue += `${ingredient.quantity} ${Narrator.articulatedUnit(ingredient.unit)}${ingredient.unit !== "" ? pluralise(ingredient.quantity) : ''}; ${ingredient.name}. \n`;
             dialogue = dialogue.replace(newLineMask, '');
           }
           break;
