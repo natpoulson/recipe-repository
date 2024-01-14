@@ -143,11 +143,11 @@ class Recipe {
               <a class="btn-floating waves-effect waves-light red accent-1" onclick="">
                 <i class="material-icons">restaurant</i>
               </a>
-              <p>${this.servings > 0 ? this.servings : '??'} serv${(this.servings > 1 || this.servings < 0) ? 'ings' : 'e'}</p>
+              <p>${this.servings > 0 ? this.servings : '??'} serv${(this.servings > 1 || this.servings < 0) ? 'es' : 'e'}</p>
             </div>
           </div>
-          <div class="read-more">
-            <button class="waves-effect waves-light btn-large" data-recipe-id="${this.id}">Read more</button>
+          <div>
+            <button class="waves-effect waves-light btn-large read-more" data-recipe-id="${this.id}">Read more</button>
           </div>
         </div>
       </div>
@@ -159,7 +159,7 @@ class Recipe {
   }
 
   get activeTemplate() {
-    return `<section class="row RecipeTitleICon">
+    return `<section class="row RecipeTitleIcon">
       <div class="col">
         <h1>${this.name}</h1>
       </div>
@@ -182,7 +182,7 @@ class Recipe {
         </div>
         <div>
           <a class="btn-floating waves-effect waves-light red accent-1"><i class="material-icons">restaurant</i></a>
-          <p>${this.servings > 0 ? this.servings : '??'} serv${(this.servings > 1 || this.servings < 0) ? 'ings' : 'e'}</p>
+          <p>${this.servings > 0 ? this.servings : '??'} serv${(this.servings > 1 || this.servings < 0) ? 'es' : 'e'}</p>
         </div>
       </div>
     </div>
@@ -204,7 +204,7 @@ class Recipe {
         <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1" data-type="4"><i class="material-icons">volume_up</i></a>
       </div>
       <div>
-        <p class="prep-ingredient-tiltle">Ingredients</p>
+        <p class="prep-ingredient-title">Ingredients</p>
         <ul>
           ${this.formattedIngredients}
         </ul>
@@ -215,8 +215,8 @@ class Recipe {
 
   get formattedIngredients() {
     let output = "";
-    for (const item in this.ingredients) {
-      output += `<li>${item.quantity} &times; ${item.unit} ${item.name}<li>\n`;
+    for (const item of this.ingredients) {
+      output += `<li>${item.quantity} ${item.unit === '' ? "&times;" : item.unit} ${item.name}<li>\n`;
     }
     output.replace(/\n$/g, '');
     return output;
@@ -224,8 +224,8 @@ class Recipe {
 
   get formattedInstructions() {
     let output = "";
-    for (const item in this.instructions) {
-      output +=  `<li>${item[0]}</li>\n`;
+    for (const item of this.instructions) {
+      output +=  `<li>${Object.values(item)[0]}</li>\n`;
     }
     output.replace(/\n$/g, '');
     return output;
@@ -296,7 +296,12 @@ class Recipe {
       // Modifying the param is a no-no, we'll copy it into a new variable instead for mutation
       const newRecipe = recipe;
       // Call spoonacular to fetch ingredients
-      const resp = await fetch(`https://api.spoonacular.com/recipes/${recipe.id}/ingredientWidget.json`);
+      const resp = await fetch(`https://api.spoonacular.com/recipes/${recipe.id}/ingredientWidget.json`, {
+        method: "GET",
+        headers: {
+          "x-api-key": Recipe.config.apiKey
+        }
+      });
 
       if (!resp.ok) {
         // Standard response error checking
@@ -310,7 +315,7 @@ class Recipe {
       for (const ingredient of data.ingredients) {
         const newIngredient = {
           quantity: ingredient['amount']['metric']['value'],
-          unit: String(ingredient['amount']['metric']['unit']).match(/s$/, ''), // Removing plural measure notations
+          unit: String(ingredient['amount']['metric']['unit']).replace(/s$/, ''), // Removing plural measure notations
           name: ingredient['name']
         };
         newRecipe.ingredients.push(newIngredient);
@@ -343,11 +348,11 @@ class Recipe {
     const id = Number(event.currentTarget.dataset['recipeId']);
 
     // Retrieve the recipe from the results list if it was triggered by a 'read more' button
-    if (event.currentTarget.parent.class.includes('read-more')) {
+    if (event.currentTarget.classList.contains('read-more')) {
       await Recipe.setActive(id);
     }
     // Retrieve the recipe from the favourites list if it was triggered by a favourite card
-    if (event.currentTarget.parent.class.includes('read-favourite')) {
+    if (event.currentTarget.classList.contains('read-favourite')) {
       await Recipe.setActive(id, true);
     }
 
@@ -578,6 +583,7 @@ function searchRecipes() {
 // Listeners
 $('#narrator').on('ended', Narrator.unload); // Removing temporary audio stream
 $('#content-main').on('click', '.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
+$('#content-main').on('click', '.read-more', Recipe.showActive);
 
 searchBtn.addEventListener("click", function () {
   alertdiv.text("");

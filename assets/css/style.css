@@ -113,10 +113,8 @@ div.card-image > .recipe-card-badges {
 }
 
 .read-more {
-  padding-top: 15px;
+  margin-top: 15px;
   text-align: center;
-}
-.read-more button {
   width: 100%;
 }
 
@@ -144,13 +142,13 @@ padding: 20px;
   position: relative;
   top: 42px;
 }
-.RecipeTitleICon {
+.RecipeTitleIcon {
   display: flex;
   justify-content: center;
   text-align: center;
   margin-top: 15px;
 }
-.RecipeTitleICon h1 {
+.RecipeTitleIcon h1 {
   color: #333;
   font-size: 35px;
   font-family: "Bree Serif", serif;
@@ -169,7 +167,7 @@ padding: 20px;
   margin: 20px 10px 20px 10px;
 }
 
-.prep-ingredient-tiltle {
+.prep-ingredient-title {
   font-size: 20px;
   font-family: "Bree Serif", serif;
 }
