@@ -118,7 +118,7 @@ class Recipe {
             <a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red" onclick="">
               <i class="material-icons">favorite</i>
               </a>
-            <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1" onclick="">
+            <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1 btn-narrate" data-type="0" data-recipe-id="${this.id}">
               <i class="material-icons">volume_up</i>
               </a>
           </div>
@@ -137,14 +137,14 @@ class Recipe {
               <p>${this.time} min</p>
             </div>
             <div>
-              <a class="btn-floating waves-effect waves-light red accent-1">
+              <a class="btn-floating waves-effect waves-light red accent-1" onclick="">
                 <i class="material-icons">restaurant</i>
               </a>
               <p>${this.servings} serve${this.servings > 1 ? 's' : ''}</p>
             </div>
           </div>
           <div class="read-more">
-            <button class="waves-effect waves-light btn-large" id="readMoreBtn" data-recipeId="${this.id}">Read more</button>
+            <button class="waves-effect waves-light btn-large" id="readMoreBtn" data-recipe-id="${this.id}">Read more</button>
           </div>
         </div>
       </div>
@@ -212,7 +212,7 @@ class Recipe {
 
   static async showResultCards() {
     // Bind our search results section first and blank what's there.
-    const results = $('#search-results');
+    const results = $('#content-main');
     results.html('');
 
     // Show no results found if the Recipe list is empty, then terminate the function.
@@ -242,6 +242,45 @@ class Narrator {
     voice: "isla"
   }
 
+  // Enumerators for parse types, used to direct the narration method
+  static type = {
+    RECIPE_CARD: 0,
+    RECIPE_FAV_CARD: 1,
+    RECIPE_INGREDIENTS: 2,
+    RECIPE_INSTRUCTIONS: 3
+  }
+
+  static parse(event) {
+    // Stop bubbling and default anchor behaviour
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Extract the parse type and recipe ID from the narration element
+    const type = event.currentTarget.dataset['type'];
+    const recipeId = event.currentTarget.dataset['recipe-id'];
+
+    // Retrieve the recipe from the current dataset
+    // Need to add handling based on type since we can only rely on the list when searching. Different contexts exist for Favourites and Ingredients/Instructions.
+    const recipe = Recipe.list.find(a => {
+      a.id === recipeId;
+    });
+
+    // Initialise the string we'll be passing to the read method
+    let dialogue;
+
+    // Identify what type of text to pass to the read function and format appropriately.
+    switch (type) {
+      case Narrator.type.RECIPE_CARD:
+        dialogue = `${recipe.name}. Serves ${recipe.servings > 0 ? recipe.servings : 'an unspecified number of'} people, and ready in ${recipe.time > 0 ? recipe.time : 'an unspecified number of'} minutes. ${recipe.description}.`;
+        break;
+      default:
+        dialogue = "Sorry, we could not interpret the text provided. Please try again.";
+        break;
+    }
+
+    Narrator.read(dialogue);
+  }
+
   static async read(text) {
     // Bind audio control
     const narrator = $('#narrator');
@@ -265,6 +304,12 @@ class Narrator {
     catch(err) {
       console.error(err);
     }
+  }
+
+  // Automatically unload the object URL of a narration for memory management purposes
+  static unload(event) {
+    event.stopPropagation();
+    URL.revokeObjectURL(event.target.src);
   }
 }
  
@@ -293,7 +338,7 @@ function searchRecipes() {
   const query = searchInput.value;
   if (!query) {
     // Condense the change to a single .html for more readability
-    $('#search-results')
+    $('#content-main')
       .html('<div class="msg-searchErr">Please enter a recipe 👨‍🍳</div>');
     return;
   }
@@ -303,13 +348,16 @@ function searchRecipes() {
     .then(() => Recipe.showResultCards()) // Show the results after query processing only.
     .catch(() => {
       // An error splash in the event that we fail to receive a response from Spoonacular
-      $('#search-results')
+      $('#content-main')
         .html('<div class="msg-searchErr">Sorry. We encountered an error fetching results. 😔</div>');
     });
 
 }
 
 // Listeners
+$('#narrator').addEventListener('ended', Narrator.unload); // Removing temporary audio stream
+$('#content-main').addEventListener('onclick', 'a.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
+
 searchBtn.addEventListener("click", function () {
   alertdiv.text("");
   card.html("");
