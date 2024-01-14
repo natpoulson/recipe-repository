@@ -75,12 +75,9 @@ class Recipe {
     */
     // Regex mask, captures the first sentence of the description
     // In testing, everything past the second sentence tended to start delving into details that were overly redundant to the rest of the card.
-    const descSentenceMask = /^(?:.+?\.){1}/;
-    // Mask for removing the <b> tags.
-    const descHTMLMask = /(\<\/?b\>)/gi;
-    // Truncate to 1 sentence then remove any instances of <b> or </b> tags
-    this.description = this.description.match(descSentenceMask);
-    this.description = String(this.description).replace(descHTMLMask, '');
+    this.description = this.description.match(/^(?:.+?\.){1}/);
+    // Just removes the bold (<b>) tags
+    this.description = String(this.description).replace(/(\<\/?b\>)/gi, '');
 
     // Ensure the object being passed has instructions
     if (Object.keys(properties).includes('analyzedInstructions')) {
@@ -110,7 +107,13 @@ class Recipe {
 
   // Getters
   get resultCard() {
-      return `<div class="col s12 m6 l4">
+    /*
+      Notes:
+      - Narration buttons require data-type="" to specify their parse handling type. See Narrator.type for the numerical list
+      - Include the data-recipe-id="" to help identify narration items in arrays (Favourites and Recipe results)
+      - Also include data-recipe-id="" for the read more button, that way we can target the recipe to make the 'active' recipe, apply the appropriate callback to fetch ingredients, then generate the page accordingly
+    */
+    return `<div class="col s12 m6 l4">
       <div class="card recipe-card">
         <div class="card-image">
           <img class="recipe-card-badges" src="${this.image}" alt="${this.name}" />
@@ -192,7 +195,7 @@ class Recipe {
 
       // Process the results before they can be used
       const data = await resp.json();
-      await Recipe.saveResults(data);
+      await Recipe.prepareResults(data);
       return;
 
     } catch(err) {
@@ -202,7 +205,7 @@ class Recipe {
     }
   }
 
-  static async saveResults(data) {
+  static async prepareResults(data) {
       // Clear any existing results and begin generating fresh results
       Recipe.list = [];
 
@@ -212,8 +215,10 @@ class Recipe {
   }
 
   static async showResultCards() {
-    // Bind our search results section first and blank what's there.
+    // Bind content zone and prepare for search results.
     const results = $('#content-main');
+    results[0].class = "";
+    results.addClass('fcards');
     results.html('');
 
     // Show no results found if the Recipe list is empty, then terminate the function.
@@ -247,8 +252,33 @@ class Narrator {
   static type = {
     RECIPE_CARD: 0,
     RECIPE_FAV_CARD: 1,
-    RECIPE_INGREDIENTS: 2,
-    RECIPE_INSTRUCTIONS: 3
+    RECIPE_ACTIVE_CARD: 2,
+    RECIPE_INGREDIENTS: 3,
+    RECIPE_INSTRUCTIONS: 4
+  }
+
+  static unit = {
+    'g':'gram',
+    'kg':'kilogram',
+    'mg':'miligram',
+    'tsp':'tea spoon',
+    'dsp':'dessert spoon',
+    'tbsp':'table spoon',
+    'ml':'mililiter',
+    'l':'liter'
+  }
+
+  static articulatedUnit(value) {
+    // Determine if the unit presented exists in the list of units we have articulations for
+    if (Object.keys(Narrator.unit)
+          .includes(String(value).toLowerCase())) {
+      // Return the articulated value
+      return Narrator.unit[value];
+    }
+
+    // Return it in uppercase in case it's an acronym
+    // Words should still be parseable like this, but acronyms will be sounded out
+    return String(value).toUpperCase();
   }
 
   static parse(event) {
@@ -267,28 +297,44 @@ class Narrator {
 
       switch (type) {
         case Narrator.type.RECIPE_CARD:
-          recipeId = Number(event.currentTarget.dataset['recipeId']);
+          // recipeId must be cast to a Number as the id in the class is handled as Number
+          // Yes, I could just remove an = and rely on type coercion instead of casting
+          // No, I am not going to do that. I'd rather die.
+          recipeId = Number(event.currentTarget.dataset['recipeId']); // data-recipe-id === recipeId
           recipe = Recipe.list.find(a => a.id === recipeId);
           break;
         case Narrator.type.RECIPE_FAV_CARD:
           recipeId = Number(event.currentTarget.dataset['recipeId']);
           recipe = Recipe.favourites.find(a => a.id === recipeId);
           break;
+        case Narrator.type.RECIPE_ACTIVE_CARD:
         case Narrator.type.RECIPE_INGREDIENTS:
         case Narrator.type.RECIPE_INSTRUCTIONS:
-          recipe = Recipe.active;
+          recipe = Recipe.active; // No searching needed
           break;
         default:
           throw new Error("No valid type detected");
       }
 
-      // Initialise the string we'll be passing to the read method
-      let dialogue = "";
+      let dialogue = ""; // Initialiser for the switch block below due to scoping
+      const newLineMask = /\n$/g; // Strips new lines at the end of a string
+      /* 
+        Why yes this *is* an arrow function for the sole purpose of adding plurals to stuff :)
+
+        For posterity I will include the original template literals with the horrid ternery operators littered throughout as a testament to why.
+
+        `${recipe.name}. Serves ${recipe.servings > 0 ? recipe.servings : 'an unspecified number of'} ${recipe.servings === 1 ? "person" : "people"}, and ready in ${recipe.time > 0 ? recipe.time : 'an unspecified number of'} minute${recipe.servings > 1 ? 's' : ''}. ${recipe.description}.`
+
+        `${ingredient.quantity} ${ingredient.quantity > 1 ? (Narrator.articulatedUnit(ingredient.unit)) + 's' : (Narrator.articulatedUnit(ingredient.unit))} of ${ingredient.name}\n`
+      */
+      const pluralise = quantity => quantity > 1 ? 's' : '';
 
       // Identify what type of text to pass to the read function and format appropriately.
       switch (type) {
         case Narrator.type.RECIPE_CARD:
-          dialogue = `${recipe.name}. Serves ${recipe.servings > 0 ? recipe.servings : 'an unspecified number of'} ${recipe.servings === 1 ? "person" : "people"}, and ready in ${recipe.time > 0 ? recipe.time : 'an unspecified number of'} minute${recipe.servings > 1 ? 's' : ''}. ${recipe.description}.`;
+        case Narrator.type.RECIPE_FAV_CARD:
+        case Narrator.type.RECIPE_ACTIVE_CARD:
+          dialogue = `${recipe.name}. Serves ${recipe.servings > 0 ? recipe.servings : 'an unspecified number of'} ${recipe.servings === 1 ? "person" : "people"}, and ready in ${recipe.time > 0 ? recipe.time : 'an unspecified number of'} minute${pluralise(recipe.time)}. ${recipe.description}.`;
           break;
         case Narrator.type.RECIPE_INSTRUCTIONS:
           // Extract each step and parse as text, include a new line at the end
@@ -296,11 +342,14 @@ class Narrator {
             dialogue += `Step ${Object.keys(step)[0]}. ${Object.values(step)[0]}.\n`;
           }
           // Remove the final new line character
-          dialogue = dialogue.replace(/\n$/g, '');
+          dialogue = dialogue.replace(newLineMask, '');
           break;
         case Narrator.type.RECIPE_INGREDIENTS:
-          // TODO: Extract the ingredients
-          dialogue = "Placeholder";
+          // TODO: Add method for populating ingredients with quantity, unit, and name values
+          for (const ingredient of recipe.ingredients) {
+            dialogue += `${ingredient.quantity} ${Narrator.articulatedUnit(ingredient.unit)}${pluralise(ingredient.quantity)} of ${ingredient.name}\n`;
+            dialogue = dialogue.replace(newLineMask, '');
+          }
           break;
       }
 
@@ -328,6 +377,7 @@ class Narrator {
 
       // Bind the audio stream to the audio control and play the narration
       narrator.attr("src", url);
+      // We have to select the element from the array so we can access the Audio object's .play() method
       narrator[0].play();
     }
     catch(err) {
