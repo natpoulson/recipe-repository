@@ -233,6 +233,40 @@ class Recipe {
     return;
   }
 }
+
+class Narrator {
+  // Configurable settings for the voicerss API
+  static config = {
+    apiKey: "5d5be935cb174f47a783187afc4a1d1e",
+    lang: "en-au",
+    voice: "isla"
+  }
+
+  static async read(text) {
+    // Bind audio control
+    const narrator = $('#narrator');
+    try {
+      // Call narration
+      const resp = await fetch(`https://api.voicerss.org/?key=${Narrator.config.apiKey}&hl=${Narrator.config.lang}&v=${Narrator.config.voice}&src=${text}`);
+
+      // Throw error message if unsuccessful.
+      if (!resp.ok) {
+        throw new Error(resp.statusText);
+      }
+
+      // Parse audio stream and create a URL for use with the audio control
+      const data = await resp.blob();
+      const url = window.URL.createObjectURL(data);
+
+      // Bind the audio stream to the audio control and play the narration
+      narrator.attr("src", url);
+      narrator.play();
+    }
+    catch(err) {
+      console.error(err);
+    }
+  }
+}
  
 /* initiate materialize */
 $(document).ready(function () {
