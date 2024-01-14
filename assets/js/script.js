@@ -258,7 +258,7 @@ class Narrator {
       event.stopPropagation();
 
       // Extract the parse type and recipe ID from the narration element
-      const type = event.currentTarget.dataset['type'];
+      const type = Number(event.currentTarget.dataset['type']);
       let recipeId;
 
       // Retrieve the recipe from the current dataset
@@ -267,16 +267,12 @@ class Narrator {
 
       switch (type) {
         case Narrator.type.RECIPE_CARD:
-          recipeId = event.currentTarget.dataset['recipe-id'];
-          recipe = Recipe.list.find(a => {
-            a.id === recipeId;
-          });
+          recipeId = Number(event.currentTarget.dataset['recipeId']);
+          recipe = Recipe.list.find(a => a.id === recipeId);
           break;
         case Narrator.type.RECIPE_FAV_CARD:
-          recipeId = event.currentTarget.dataset['recipe-id'];
-          recipe = Recipe.favourites.find(a => {
-            a.id === recipeId;
-          });
+          recipeId = Number(event.currentTarget.dataset['recipeId']);
+          recipe = Recipe.favourites.find(a => a.id === recipeId);
           break;
         case Narrator.type.RECIPE_INGREDIENTS:
         case Narrator.type.RECIPE_INSTRUCTIONS:
@@ -292,7 +288,7 @@ class Narrator {
       // Identify what type of text to pass to the read function and format appropriately.
       switch (type) {
         case Narrator.type.RECIPE_CARD:
-          dialogue = `${recipe.name}. Serves ${recipe.servings > 0 ? recipe.servings : 'an unspecified number of'} people, and ready in ${recipe.time > 0 ? recipe.time : 'an unspecified number of'} minutes. ${recipe.description}.`;
+          dialogue = `${recipe.name}. Serves ${recipe.servings > 0 ? recipe.servings : 'an unspecified number of'} ${recipe.servings === 1 ? "person" : "people"}, and ready in ${recipe.time > 0 ? recipe.time : 'an unspecified number of'} minute${recipe.servings > 1 ? 's' : ''}. ${recipe.description}.`;
           break;
         case Narrator.type.RECIPE_INSTRUCTIONS:
           // Extract each step and parse as text, include a new line at the end
@@ -332,7 +328,7 @@ class Narrator {
 
       // Bind the audio stream to the audio control and play the narration
       narrator.attr("src", url);
-      narrator.play();
+      narrator[0].play();
     }
     catch(err) {
       console.error(err);
@@ -388,8 +384,8 @@ function searchRecipes() {
 }
 
 // Listeners
-$('#narrator').addEventListener('ended', Narrator.unload); // Removing temporary audio stream
-$('#content-main').addEventListener('onclick', 'a.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
+$('#narrator').on('ended', Narrator.unload); // Removing temporary audio stream
+$('#content-main').on('click', '.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
 
 searchBtn.addEventListener("click", function () {
   alertdiv.text("");
