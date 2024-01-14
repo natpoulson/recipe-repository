@@ -256,7 +256,8 @@ class Recipe {
   static active = {}; // Recipe currently being viewed
   static config = { // Add any configurable values here for reuse where needed
     searchLimit: 9,
-    apiKey: "d6b7732ac8f6419095e86a0d96cc3570"
+    apiKey: "d6b7732ac8f6419095e86a0d96cc3570",
+    favStoreName: "dd-favourites"
   }
 
   // Static Methods
@@ -393,6 +394,33 @@ class Recipe {
     // Apply the results to the container
     content.html(formattedResults);
     return;
+  }
+
+  static async addFavourite(event) {
+    const recipeId = Number(event.dataset['recipeId']);
+    // Abort if a recipe is found
+    if (!Recipe.favourites.indexOf(a => a.id === recipeId) === -1) {
+      return;
+    }
+
+    // Obtain the recipe, pre-fill ingredients, and then add to the favourites array
+    let recipe = Recipe.list.find(a => a.id === recipeId);
+    recipe = await Recipe.fetchIngredients(recipe);
+    Recipe.favourites.push(recipe);
+    Recipe.saveFavourites();
+  }
+
+  static saveFavourites() {
+    localStorage.setItem(Recipe.config.favStoreName, JSON.stringify(Recipe.favourites));
+  }
+
+  static loadFavourites() {
+    if (localStorage.getItem(Recipe.config.favStoreName)) {
+      const tempFavs = JSON.parse(localStorage.getItem(Recipe.config.favStoreName));
+      for (const fav of tempFavs) {
+        Recipe.favourites.push(new Recipe(Number(fav.id), fav, true));
+      }
+    }
   }
 
 }
