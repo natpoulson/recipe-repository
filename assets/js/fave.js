@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', function(){
         function appendCardToSidebar(cardID) {
         const favoritesCard = document.querySelector('.favouritesCard');
         const cardClone = document.getElementById(cardID).cloneNode(true);
-        cardClone.classList.add('appendedCard'); // Add a class to the cloned card
-        cardClone.removeAttribute('id'); // Remove the ID to avoid duplication
+        cardClone.classList.add('appendedCard');
+        cardClone.removeAttribute('id');
         favoritesCard.appendChild(cardClone);
         }
 
