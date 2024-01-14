@@ -81,6 +81,30 @@ class Recipe {
 
     // Ensure the object being passed has instructions
     if (Object.keys(properties).includes('analyzedInstructions')) {
+      // Dictionary of regex patterns and substitutions for cleaning instruction text for parsing.
+      const sanitisers = [
+        {
+          // Replace ampersands with HTML-safe versions
+          pattern: /&/,
+          substitution: '&amp;'
+        },
+        {
+          // Remove any leading numbers
+          pattern: /^[0-9]+?\s?/,
+          substitution: ''
+        },
+        {
+          // Remove any trailing numbers
+          pattern: /\s?[0-9]\.?$/,
+          substitution: '.'
+        },
+        {
+          // Create space between full stop and next word
+          // This would break URLs but these are instructions, they shouldn't have those.
+          pattern: /\.(?!\s|\d|$)/,
+          substitution: '. '
+        }
+      ];
       // Extract the steps for processing
       // The [0] is utterly asinine, but that's because of the way Spoonacular returns it
       // "Yes, a breakdown of the instructions should start with an array with a single element, which contains the object detailing the actual steps. I am a programmer :)"
@@ -89,7 +113,16 @@ class Recipe {
         const newInstruction = {};
         // Inject a step in the format { '0':'Preheat oven to 200F' }
         // This is so we can keep track of the step count using the key when sorting the array
-        newInstruction[instruction['number']] = instruction['step'];
+        let cleanedInstruction = instruction['step'];
+        for (const sanitiser in sanitisers) {
+          // Iterate through all sanitisers and apply to the instruction
+          cleanedInstruction = cleanedInstruction.replace(sanitiser.pattern, sanitiser.substitution);
+          // Run a quick regex on the end to see if there's no full stop, add one if that's the case
+          if (!(/\.$/).test(cleanedInstruction)) {
+            cleanedInstruction += '.';
+          }
+        }
+        newInstruction[instruction['number']] = cleanedInstruction;
         // Push the sysnthesised object to the instructions array
         this.instructions.push(Object(newInstruction));
       }
@@ -163,7 +196,7 @@ class Recipe {
       <div class="col">
         <h1>${this.name}</h1>
       </div>
-      <div id="recipe-page-header" class="col"><a class="btn-floating waves-effect waves-light red"><i class="material-icons">favorite</i></a>
+      <div id="recipe-page-header" class="col"><a class="btn-floating waves-effect waves-light red btn-narrate"><i class="material-icons">favorite</i></a>
         <a class="btn-floating waves-effect waves-light red accent-1" data-type="2"><i class="material-icons">volume_up</i></a>
       </div>
     </section>
@@ -190,7 +223,7 @@ class Recipe {
     <section class="row" id="preparation">
     <div class="col s7" id="prepDetails1" style="margin-left: 10px; margin-bottom: 20px; margin-top: 20px">
       <div class="prepIcon">
-        <a class="btn-floating waves-effect waves-light red accent-1" data-type="3"><i class="material-icons" >volume_up</i></a>
+        <a class="btn-narrate btn-floating waves-effect waves-light red accent-1" data-type="3"><i class="material-icons" >volume_up</i></a>
       </div>
       <div>
         <p class="prep-ingredient-title">Instructions</p>
@@ -201,7 +234,7 @@ class Recipe {
     </div>
     <div class="col s5" id="prepDetails2">
       <div class="prepIcon">
-        <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1" data-type="4"><i class="material-icons">volume_up</i></a>
+        <a aria-label="Read Aloud" class="btn-narrate btn-floating waves-effect waves-light red accent-1" data-type="4"><i class="material-icons">volume_up</i></a>
       </div>
       <div>
         <p class="prep-ingredient-title">Ingredients</p>
@@ -486,7 +519,7 @@ class Narrator {
         case Narrator.type.RECIPE_INSTRUCTIONS:
           // Extract each step and parse as text, include a new line at the end
           for (const step of recipe.instructions) {
-            dialogue += `Step ${Object.keys(step)[0]}. ${Object.values(step)[0]}.\n`;
+            dialogue += `Step ${Object.keys(step)[0]}; ${Object.values(step)[0]} \n`;
           }
           // Remove the final new line character
           dialogue = dialogue.replace(newLineMask, '');
@@ -494,7 +527,7 @@ class Narrator {
         case Narrator.type.RECIPE_INGREDIENTS:
           // TODO: Add method for populating ingredients with quantity, unit, and name values
           for (const ingredient of recipe.ingredients) {
-            dialogue += `${ingredient.quantity} ${Narrator.articulatedUnit(ingredient.unit)}${pluralise(ingredient.quantity)}, ${ingredient.name}\n`;
+            dialogue += `${ingredient.quantity} ${Narrator.articulatedUnit(ingredient.unit)}${pluralise(ingredient.quantity)}; ${ingredient.name}. \n`;
             dialogue = dialogue.replace(newLineMask, '');
           }
           break;
