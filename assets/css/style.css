@@ -166,7 +166,6 @@ padding: 20px;
 
 /* STACEY WORK FOR FAVOURITE MODAL*/
 .favouritesCard {
-  font-family: 'july it', sans-serif;
   position: fixed;
   top: 0;
   width: 500px;
@@ -174,10 +173,11 @@ padding: 20px;
   height: 100vh;
   left: 100%; /* Initially off-screen to the right */
   transition: left 0.5s ease;
-  z-index: 2;
+  z-index: 5;
   border-radius: 20px 0 0 0;
   overflow-y: auto;
   box-shadow: 10px 10px black, 1em 0.4em;
+  
 }
 
 .visible {
@@ -186,14 +186,15 @@ padding: 20px;
 
 
 .favouritesCard h2 {
+  font-family: 'july it', sans-serif;
   color: #000000;
-  font-weight: 100;
   margin: 0;
-  text-align: center; /* Center the text */
-  line-height: 1.5; /* Adjust line height for better vertical centering */
+  text-align: center;
+  line-height: 1.5; 
   padding-top: 20px;
   padding-bottom: 20px;
   background-color: #ffffff;
+
 }
 
 .favouritesCard .closeSidebar {
@@ -201,12 +202,11 @@ padding: 20px;
   bottom: 0;
   width: 100%;
   display: flex;
-  justify-content: center; /* Center the button horizontally */
-  align-items: center; /* Center the button vertically */
+  justify-content: center;
+  align-items: center;
   background-color: #ff9999;
   height: 70px;
   font-weight: bold;
-  cursor: pointer;
   border: none;
   color: white;
   box-shadow: #000000;
@@ -216,5 +216,38 @@ padding: 20px;
 .closeSidebar:hover {
   background-color: #2BBBAD;
 }
+
+/* Buttons on the Recipe cards */
+
+.btn-floating i:hover {
+  width: inherit;
+  display: inline-block;
+  text-align: center;
+  background-color: #2BBBAD;
+  font-size: 1.6rem;
+  line-height: 40px;
+}
+
+
+.favoritesIcon {
+background-color: #2BBBAD;
+}
+
+.favoritesIcon.isFavorite {
+  color: #2BBBAD;
+}
+
+/* Styling in Appended cards in the favourites modal*/
+.appendedCard {
+  border-radius: 15px;
+  width: 350px;
+  height: auto;
+  margin-left: 80px;
+}
+  
+  .card-title {
+    font-family: 'july it', sans-serif;
+    padding: 10px;
+  }
 
 

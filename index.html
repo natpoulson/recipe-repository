@@ -91,12 +91,14 @@
       </div>
     </section>
 
- <!-- STACEY MAKING NOTES & SECTIONS FOR FAVOURITES MENU TO APPEAR---------------------------------->
+ <!-- STACEY MAKING NOTES & SECTIONS FOR FAVOURITES MENU TO APPEAR ---------------------------------->
+
  <section>
   <div class="favouritesCard hidden" >
     <h2>Favourites</h2>
-    <!-- Add your content here -->
-    <ul class="listCard">
+
+    <!-- Sample List Card -->
+    <!-- <ul class="listCard">
               <div class="row" style="padding: 30px 30px 30px 30px;">
           <div class="col s12 m10">
             <div
@@ -139,7 +141,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
     </ul>
     <div class="favouriteFoods">
@@ -147,7 +149,19 @@
     </div>
   </div>
 </section>
-  <!-- STACEY END OF WORK--------------------------------------------------------------------------->
+  <!-- STACEY END OF WORK Favourites Sidebar--------------------------------------------------------------------------->
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- Website description section -->
     <section class="description">
@@ -199,12 +213,13 @@
     <section class="fcards">
       <div class="row" style="padding-left: 50px; padding-right: 50px">
         <div class="col s12 m6 l3">
-          <div class="card recipe-card">
-            <div class="card-image">
+          <div class="card recipe-card" id="staticRecipe">
+            <div class="card-image id="cardImage">
               <!--  -->
               <img
                 class="recipe-card-badges"
                 src="./assets/images/nav-background1.png"
+                style="border-top-right-radius: 15px; border-top-left-radius: 15px;"
                 alt=""
               />
 
@@ -212,7 +227,7 @@
                 <a
                   style="margin-right: 12px"
                   class="btn-floating waves-effect waves-light red"
-                  ><i class="material-icons">favorite</i></a
+                  ><i class="material-icons" id="favoritesIcon">favorite</i></a
                 >
                 <a class="btn-floating waves-effect waves-light red accent-1"
                   ><i class="material-icons">volume_up</i></a
@@ -226,7 +241,7 @@
                 I am a very simple card. I am good at containing small bits of
                 information.
               </p>
-              <div class="timeServesIcons">
+              <div class="timeServesIcons" id="timeServed">
                 <div>
                   <a class="btn-floating waves-effect waves-light red accent-1"
                     ><i class="material-icons">schedule</i></a
