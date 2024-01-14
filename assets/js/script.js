@@ -159,10 +159,16 @@ class Recipe {
   }
 
   get activeTemplate() {
-    return `<section class="row recipe-page-description">
-    <img src="./assets/images/placeholder2.jpg"
-      alt="${this.name}" class="col s4" height="300px"/>
-
+    return `<section class="row RecipeTitleICon">
+      <div class="col">
+        <h1>${this.name}</h1>
+      </div>
+      <div id="recipe-page-header" class="col"><a class="btn-floating waves-effect waves-light red"><i class="material-icons">favorite</i></a>
+        <a class="btn-floating waves-effect waves-light red accent-1" data-type="2"><i class="material-icons">volume_up</i></a>
+      </div>
+    </section>
+    <section class="row recipe-page-description">
+    <img src="${this.image}" alt="${this.name}" class="col s4" height="300px"/>
     <div class="col s7 recipe-description-div">
       <p style="text-align: center">
         ${this.description}
@@ -184,7 +190,7 @@ class Recipe {
     <section class="row" id="preparation">
     <div class="col s7" id="prepDetails1" style="margin-left: 10px; margin-bottom: 20px; margin-top: 20px">
       <div class="prepIcon">
-        <a class="btn-floating waves-effect waves-light red accent-1" data-type="2"><i class="material-icons" >volume_up</i></a>
+        <a class="btn-floating waves-effect waves-light red accent-1" data-type="3"><i class="material-icons" >volume_up</i></a>
       </div>
       <div>
         <p class="prep-ingredient-title">Instructions</p>
@@ -195,7 +201,7 @@ class Recipe {
     </div>
     <div class="col s5" id="prepDetails2">
       <div class="prepIcon">
-        <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1"><i class="material-icons">volume_up</i></a>
+        <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1" data-type="4"><i class="material-icons">volume_up</i></a>
       </div>
       <div>
         <p class="prep-ingredient-tiltle">Ingredients</p>
@@ -389,8 +395,8 @@ class Narrator {
     RECIPE_CARD: 0,
     RECIPE_FAV_CARD: 1,
     RECIPE_ACTIVE_CARD: 2,
-    RECIPE_INGREDIENTS: 3,
-    RECIPE_INSTRUCTIONS: 4
+    RECIPE_INSTRUCTIONS: 3,
+    RECIPE_INGREDIENTS: 4
   }
 
   static unit = {
