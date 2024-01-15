@@ -247,10 +247,10 @@ class Recipe {
   }
 
   get favouriteCheck() {
-    if (Recipe.favourites.findIndex(a => a.id === this.id) !== -1) {
-      return `<a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red add-fav" data-recipe-id="${this.id}"><i class="material-icons">favorite</i></a>`;
+    if (Recipe.favourites.findIndex(a => a.id === this.id) > Number(-1)) {
+      return `<a aria-label="Remove Recipe from Favourites" class="btn-floating waves-effect waves-light red accent-1 fav-remove" data-recipe-id="${this.id}"><i class="material-icons">remove</i></a>`;
     }
-    return `<a aria-label="Remove Recipe from Favourites" class="btn-floating waves-effect waves-light red accent-1 fav-remove" data-recipe-id="${this.id}"><i class="material-icons">remove</i></a>`;
+    return `<a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red fav-add" data-recipe-id="${this.id}"><i class="material-icons">favorite</i></a>`;
   }
 
   get formattedIngredients() {
@@ -418,7 +418,9 @@ class Recipe {
   }
 
   static async addFavourite(event) {
-    const recipeId = Number(event.dataset['recipeId']);
+    event.preventDefault();
+    event.stopPropagation();
+    const recipeId = Number(event.currentTarget.dataset['recipeId']);
     // Abort if a recipe is found
     if (!Recipe.favourites.indexOf(a => a.id === recipeId) === -1) {
       return;
@@ -429,6 +431,16 @@ class Recipe {
     recipe = await Recipe.fetchIngredients(recipe);
     Recipe.favourites.push(recipe);
     Recipe.saveFavourites();
+  }
+
+  static removeFavourite(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const recipeId = Number(event.currentTarget.dataset['recipeId']);
+    const index = Recipe.favourites.findIndex(a => a.id === recipeId);
+    Recipe.favourites.splice(index, 1);
+    Recipe.saveFavourites();
+    Recipe.renderFavourites();
   }
 
   static saveFavourites() {
@@ -652,8 +664,11 @@ function searchRecipes() {
 // Listeners and inits
 $(function () {
   $('#narrator').on('ended', Narrator.unload); // Removing temporary audio stream
-  $('#content-main').on('click', '.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
   $('#content-main').on('click', '.read-more', Recipe.showActive);
+  $('body').on('click', '.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
+  $('body').on('click', '.fav-add', Recipe.addFavourite);
+  $('body').on('click', '.fav-remove', Recipe.removeFavourite);
+  $('#fave').on('click', Recipe.renderFavourites);
   searchBtn.addEventListener("click", function () {
     alertdiv.text("");
     card.html("");
