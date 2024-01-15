@@ -24,9 +24,6 @@ class Recipe {
       'description':'summary',
       'servings':'servings',
       'time':'readyInMinutes',
-      'hasMeat':'vegetarian',
-      'hasDairy':'dairyFree',
-      'hasGluten':'glutenFree',
       'source':'source'
     }
     // Handling in cases where importMode is enabled
@@ -39,9 +36,6 @@ class Recipe {
       this.time = properties['time'];
       this.instructions = properties['instructions'];
       this.ingredients = properties['ingredients'];
-      this.hasMeat = properties['hasMeat'];
-      this.hasDairy = properties['hasDairy'];
-      this.hasGluten = properties['hasGluten'];
       this.source = properties['source'];
       return;
     }
@@ -81,6 +75,30 @@ class Recipe {
 
     // Ensure the object being passed has instructions
     if (Object.keys(properties).includes('analyzedInstructions')) {
+      // Dictionary of regex patterns and substitutions for cleaning instruction text for parsing.
+      const sanitisers = [
+        {
+          // Replace ampersands with just the word to avoid accidentally breaking the query string
+          pattern: /&/,
+          substitution: 'and'
+        },
+        {
+          // Remove any leading numbers
+          pattern: /^[0-9]+?\s?/,
+          substitution: ''
+        },
+        {
+          // Remove any trailing numbers
+          pattern: /\s?[0-9]\.?$/,
+          substitution: '.'
+        },
+        {
+          // Create space between full stop and next word
+          // This would break URLs but these are instructions, they shouldn't have those.
+          pattern: /\.(?=[A-Za-z])/,
+          substitution: '. '
+        }
+      ];
       // Extract the steps for processing
       // The [0] is utterly asinine, but that's because of the way Spoonacular returns it
       // "Yes, a breakdown of the instructions should start with an array with a single element, which contains the object detailing the actual steps. I am a programmer :)"
@@ -89,20 +107,21 @@ class Recipe {
         const newInstruction = {};
         // Inject a step in the format { '0':'Preheat oven to 200F' }
         // This is so we can keep track of the step count using the key when sorting the array
-        newInstruction[instruction['number']] = instruction['step'];
+        let cleanedInstruction = instruction['step'];
+        for (const sanitiser of sanitisers) {
+          // Iterate through all sanitisers and apply to the instruction
+          cleanedInstruction = cleanedInstruction.replace(sanitiser.pattern, sanitiser.substitution);
+          // Run a quick regex on the end to see if there's no full stop, add one if that's the case
+          if (!(/\.$/).test(cleanedInstruction)) {
+            cleanedInstruction += '.';
+          }
+        }
+        newInstruction[instruction['number']] = cleanedInstruction;
         // Push the sysnthesised object to the instructions array
         this.instructions.push(Object(newInstruction));
       }
-      // Sort in ascending order by comparing the extracted values of the steps
-      // this.instructions.sort((a, b) => {
-      //   return Object.values(a)[0] < Object.values(b)[0];
-      // });
     }
     
-    // Invert the values of the booleans, since spoonacular's keys are inversions of what we want
-    this.hasMeat = !this.hasMeat;
-    this.hasDairy = !this.hasDairy;
-    this.hasGluten = !this.hasGluten;
   }
 
   // Getters
@@ -118,7 +137,7 @@ class Recipe {
         <div class="card-image">
           <img class="recipe-card-badges" src="${this.image}" alt="${this.name}" />
           <div class="recipe-card-details">
-            <a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red" onclick="">
+            <a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red">
               <i class="material-icons">favorite</i>
               </a>
             <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1 btn-narrate" data-type="0" data-recipe-id="${this.id}">
@@ -137,25 +156,98 @@ class Recipe {
               <a class="btn-floating waves-effect waves-light red accent-1">
                 <i class="material-icons">schedule</i>
               </a>
-              <p>${this.time} min</p>
+              <p>${this.time > 0 ? this.time : '??'} min${(this.time > 1 || this.time < 0) ? 's' : ''}</p>
             </div>
             <div>
               <a class="btn-floating waves-effect waves-light red accent-1" onclick="">
                 <i class="material-icons">restaurant</i>
               </a>
-              <p>${this.servings} serve${this.servings > 1 ? 's' : ''}</p>
+              <p>${this.servings > 0 ? this.servings : '??'} serv${(this.servings > 1 || this.servings < 0) ? 'es' : 'e'}</p>
             </div>
           </div>
-          <div class="read-more">
-            <button class="waves-effect waves-light btn-large" id="readMoreBtn" data-recipe-id="${this.id}">Read more</button>
+          <div>
+            <button class="waves-effect waves-light btn-large read-more" data-recipe-id="${this.id}">Read more</button>
           </div>
         </div>
       </div>
-    </div>`
+    </div>`;
   }
 
   get favouriteCard() {
     return ``; // Add your HTML snippet for favourite cards here!
+  }
+
+  get activeTemplate() {
+    return `<section class="row RecipeTitleIcon">
+      <div class="col">
+        <h1>${this.name}</h1>
+      </div>
+      <div id="recipe-page-header" class="col"><a class="btn-floating waves-effect waves-light red btn-narrate"><i class="material-icons">favorite</i></a>
+        <a class="btn-floating waves-effect waves-light red accent-1" data-type="2"><i class="material-icons">volume_up</i></a>
+      </div>
+    </section>
+    <section class="row recipe-page-description">
+    <img src="${this.image}" alt="${this.name}" class="col s4" height="300px"/>
+    <div class="col s7 recipe-description-div">
+      <p style="text-align: center">
+        ${this.description}
+      </p>
+    </div>
+    <div style="display: flex; align-items: center; padding-left: 10px" class="col">
+      <div>
+        <div>
+          <a class="btn-floating waves-effect waves-light red accent-1"><i class="material-icons">schedule</i></a>
+          <p>${this.time} min${this.time > 1 ? 's' : ''}</p>
+        </div>
+        <div>
+          <a class="btn-floating waves-effect waves-light red accent-1"><i class="material-icons">restaurant</i></a>
+          <p>${this.servings > 0 ? this.servings : '??'} serv${(this.servings > 1 || this.servings < 0) ? 'es' : 'e'}</p>
+        </div>
+      </div>
+    </div>
+    </section>
+    <section class="row" id="preparation">
+    <div class="col s7" id="prepDetails1" style="margin-left: 10px; margin-bottom: 20px; margin-top: 20px">
+      <div class="prepIcon">
+        <a class="btn-narrate btn-floating waves-effect waves-light red accent-1" data-type="3"><i class="material-icons" >volume_up</i></a>
+      </div>
+      <div>
+        <p class="prep-ingredient-title">Instructions</p>
+        <ol>
+          ${this.formattedInstructions}
+        </ol>
+      </div>
+    </div>
+    <div class="col s5" id="prepDetails2">
+      <div class="prepIcon">
+        <a aria-label="Read Aloud" class="btn-narrate btn-floating waves-effect waves-light red accent-1" data-type="4"><i class="material-icons">volume_up</i></a>
+      </div>
+      <div>
+        <p class="prep-ingredient-title">Ingredients</p>
+        <ul>
+          ${this.formattedIngredients}
+        </ul>
+      </div>
+    </div>
+  </section>`;
+  }
+
+  get formattedIngredients() {
+    let output = "";
+    for (const item of this.ingredients) {
+      output += `<li>${item.quantity} ${item.unit === '' ? "&times;" : item.unit} ${item.name}<li>\n`;
+    }
+    output.replace(/\n$/g, '');
+    return output;
+  }
+
+  get formattedInstructions() {
+    let output = "";
+    for (const item of this.instructions) {
+      output += `<li>${Object.values(item)[0]}</li>\n`;
+    }
+    output.replace(/\n$/g, '');
+    return output;
   }
 
   // Static properties
@@ -168,19 +260,10 @@ class Recipe {
   }
 
   // Static Methods
-  static async search(query, searchOpts = { limit:Recipe.config.searchLimit, offset:0 }) {
-    // If passing searchOpts, make sure you specify a limit and offset
-    // Otherwise we'll inject the default values as a failover
-    if (!Object.keys(searchOpts).includes('limit')) {
-      searchOpts['limit'] = Recipe.config.searchLimit;
-    }
-    if (!Object.keys(searchOpts).includes('offset')) {
-      searchOpts['offset'] = 0;
-    }
-
+  static async search(query, offset = 0) {
     try {
       // Query Spoonacular
-      const resp = await fetch(`https://api.spoonacular.com/recipes/complexSearch?query=${query}&addRecipeInformation=true&number=${searchOpts.limit}&offset=${searchOpts.offset}`, {
+      const resp = await fetch(`https://api.spoonacular.com/recipes/complexSearch?query=${query}&addRecipeInformation=true&number=${Recipe.config.searchLimit}&offset=${offset}`, {
         method: "GET",
         headers: {
           // Replace this with your own API key if you want to test using your quotas
@@ -214,16 +297,89 @@ class Recipe {
       }
   }
 
+  static async fetchIngredients(recipe) {
+    if (recipe.ingredients.length > 0) {
+      return recipe; // You already have ingredients, return without modification
+    }
+
+    try {
+      // Modifying the param is a no-no, we'll copy it into a new variable instead for mutation
+      const newRecipe = recipe;
+      // Call spoonacular to fetch ingredients
+      const resp = await fetch(`https://api.spoonacular.com/recipes/${recipe.id}/ingredientWidget.json`, {
+        method: "GET",
+        headers: {
+          "x-api-key": Recipe.config.apiKey
+        }
+      });
+
+      if (!resp.ok) {
+        // Standard response error checking
+        throw new Error(resp.statusText);
+      }
+
+      // Digest the response
+      const data = await resp.json();
+
+      // Unpack the ingredients and store to a new object we'll add to the ingredients array
+      for (const ingredient of data.ingredients) {
+        const newIngredient = {
+          quantity: Number(Number(ingredient['amount']['metric']['value']).toFixed(2)),
+          unit: String(ingredient['amount']['metric']['unit']).replace(/s$/, '').toLowerCase(), // Removing plural measure notations
+          name: ingredient['name']
+        };
+        newRecipe.ingredients.push(newIngredient);
+      }
+
+      // Return our mutated recipe object
+      return newRecipe;
+
+    } catch(err) {
+      console.error(err);
+    }
+  }
+
+  static async setActive(id, isFavourite = false) {
+    // Return from the favourites list directly
+    if (isFavourite) {
+      Recipe.active = Recipe.favourites.find(a => a.id === id);
+      return;
+    }
+
+    // Return from search results, obtain ingredients
+    const tempRecipe = Recipe.list.find(a => a.id === id);
+    Recipe.active = await Recipe.fetchIngredients(tempRecipe);
+    return;
+  }
+
+  static async showActive(event) {
+    const content = $('#content-main');
+    // Retrieve the recipeId from our card (this method is only used on lists)
+    const id = Number(event.currentTarget.dataset['recipeId']);
+
+    // Retrieve the recipe from the results list if it was triggered by a 'read more' button
+    if (event.currentTarget.classList.contains('read-more')) {
+      await Recipe.setActive(id);
+    }
+    // Retrieve the recipe from the favourites list if it was triggered by a favourite card
+    if (event.currentTarget.classList.contains('read-favourite')) {
+      await Recipe.setActive(id, true);
+    }
+
+    content[0].class = '';
+    content.html(Recipe.active.activeTemplate);
+  }
+
   static async showResultCards() {
     // Bind content zone and prepare for search results.
-    const results = $('#content-main');
-    results[0].class = "";
-    results.addClass('fcards');
-    results.html('');
+    const content = $('#content-main');
+    content[0].class = "";
+    content.addClass('fcards');
+    content.html('');
 
     // Show no results found if the Recipe list is empty, then terminate the function.
     if (Recipe.list.length === 0) {
-      results.html('<div class="msg-searchErr">No recipes found. 😥</div>');
+      content.html('<div class="msg-searchErr">No recipes found. 😥</div>');
       return;
     }
 
@@ -235,9 +391,10 @@ class Recipe {
     formattedResults += '</div>';
 
     // Apply the results to the container
-    results.html(formattedResults);
+    content.html(formattedResults);
     return;
   }
+
 }
 
 class Narrator {
@@ -253,8 +410,8 @@ class Narrator {
     RECIPE_CARD: 0,
     RECIPE_FAV_CARD: 1,
     RECIPE_ACTIVE_CARD: 2,
-    RECIPE_INGREDIENTS: 3,
-    RECIPE_INSTRUCTIONS: 4
+    RECIPE_INSTRUCTIONS: 3,
+    RECIPE_INGREDIENTS: 4
   }
 
   static unit = {
@@ -339,7 +496,7 @@ class Narrator {
         case Narrator.type.RECIPE_INSTRUCTIONS:
           // Extract each step and parse as text, include a new line at the end
           for (const step of recipe.instructions) {
-            dialogue += `Step ${Object.keys(step)[0]}. ${Object.values(step)[0]}.\n`;
+            dialogue += `Step ${Object.keys(step)[0]}; ${Object.values(step)[0]} \n`;
           }
           // Remove the final new line character
           dialogue = dialogue.replace(newLineMask, '');
@@ -347,7 +504,7 @@ class Narrator {
         case Narrator.type.RECIPE_INGREDIENTS:
           // TODO: Add method for populating ingredients with quantity, unit, and name values
           for (const ingredient of recipe.ingredients) {
-            dialogue += `${ingredient.quantity} ${Narrator.articulatedUnit(ingredient.unit)}${pluralise(ingredient.quantity)} of ${ingredient.name}\n`;
+            dialogue += `${ingredient.quantity} ${Narrator.articulatedUnit(ingredient.unit)}${ingredient.unit !== "" ? pluralise(ingredient.quantity) : ''}; ${ingredient.name}. \n`;
             dialogue = dialogue.replace(newLineMask, '');
           }
           break;
@@ -436,6 +593,7 @@ function searchRecipes() {
 // Listeners
 $('#narrator').on('ended', Narrator.unload); // Removing temporary audio stream
 $('#content-main').on('click', '.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
+$('#content-main').on('click', '.read-more', Recipe.showActive);
 
 searchBtn.addEventListener("click", function () {
   alertdiv.text("");
