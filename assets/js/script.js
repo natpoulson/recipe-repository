@@ -48,22 +48,6 @@ class Recipe {
       }
     }
 
-    /* 
-      Because it's potentially interesting I'll give you a breakdown:
-      Syntax for a RegEx string:
-        / / - Indicators of a RegEx string. You have to enter at least one character between for it to count as one or else it just becomes a single line comment
-        ^  - Matches from the first character in the string
-        (?:) - Indicates a group of characters - The ?: indicates that it shouldn't be captured, simply matched (Capturing means you can splice these in elsewhere using certain syntax)
-        . - Represents ANY single character
-        + - Match one or more of the preceding character (Note if you don't combine this with any other qualifiers this would match everything after it)
-        ? - Makes the previous modifier lazy (interrupt as soon as it encounters a character specified after it)
-        \. - Escaped full stop, prevents it from being read as a wildcard. You can use this on any other character that might otherwise be interpreted as a modifier, such as \? for a question mark
-        {} - Match the specified number of occurrences of the preceding character or group. You can use a single number to specify a match only if it repeats the exact number of times, or use two numbers separated by a comma to specify a range
-        
-        All together, the RegEx mask is searching for up to three complete sentences from the start using this combination.
-
-        You can learn more and experiment with RegEx using https://regexr.com
-    */
     // Regex mask, captures the first sentence of the description
     // In testing, everything past the second sentence tended to start delving into details that were overly redundant to the rest of the card.
     this.description = this.description.match(/^(?:.+?\.){1}/);
@@ -98,7 +82,6 @@ class Recipe {
       ];
       // Extract the steps for processing
       // The [0] is utterly asinine, but that's because of the way Spoonacular returns it
-      // "Yes, a breakdown of the instructions should start with an array with a single element, which contains the object detailing the actual steps. I am a programmer :)"
       for (const instruction of properties['analyzedInstructions'][0]['steps']) {
         // Create a temporary object to synthesise a 'step', since we can't directly create an object with that property
         const newInstruction = {};
@@ -436,14 +419,17 @@ class Recipe {
   static removeFavourite(event) {
     event.preventDefault();
     event.stopPropagation();
+    // Identify the index of the recipe and splice it from the array, limit to 1 result so we don't accidentally nuke eveeryting
     const recipeId = Number(event.currentTarget.dataset['recipeId']);
     const index = Recipe.favourites.findIndex(a => a.id === recipeId);
     Recipe.favourites.splice(index, 1);
+    // Make sure to save and update cards
     Recipe.saveFavourites();
     Recipe.renderFavourites();
   }
 
   static saveFavourites() {
+    // Simple write of the favourites property to the local storage
     localStorage.setItem(Recipe.config.favStoreName, JSON.stringify(Recipe.favourites));
   }
 
@@ -485,6 +471,7 @@ class Narrator {
     RECIPE_INGREDIENTS: 4
   }
 
+  // Articulation aids for common units of measure
   static unit = {
     'g':'gram',
     'kg':'kilogram',
@@ -506,7 +493,7 @@ class Narrator {
 
     // Return it in uppercase in case it's an acronym
     // Words should still be parseable like this, but acronyms will be sounded out
-    return String(value).toUpperCase();
+    return String(value);
   }
 
   static parse(event) {
@@ -546,16 +533,7 @@ class Narrator {
 
       let dialogue = ""; // Initialiser for the switch block below due to scoping
       const newLineMask = /\n$/g; // Strips new lines at the end of a string
-      /* 
-        Why yes this *is* an arrow function for the sole purpose of adding plurals to stuff :)
-
-        For posterity I will include the original template literals with the horrid ternery operators littered throughout as a testament to why.
-
-        `${recipe.name}. Serves ${recipe.servings > 0 ? recipe.servings : 'an unspecified number of'} ${recipe.servings === 1 ? "person" : "people"}, and ready in ${recipe.time > 0 ? recipe.time : 'an unspecified number of'} minute${recipe.servings > 1 ? 's' : ''}. ${recipe.description}.`
-
-        `${ingredient.quantity} ${ingredient.quantity > 1 ? (Narrator.articulatedUnit(ingredient.unit)) + 's' : (Narrator.articulatedUnit(ingredient.unit))} of ${ingredient.name}\n`
-      */
-      const pluralise = quantity => quantity > 1 ? 's' : '';
+      const pluralise = quantity => quantity > 1 ? 's' : ''; // Condense the plural check to a single arrow function
 
       // Identify what type of text to pass to the read function and format appropriately.
       switch (type) {
