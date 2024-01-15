@@ -170,7 +170,7 @@ class Recipe {
 
   get favouriteCard() {
     return `<div class="col s12">
-    <div class="card horizontal" data-recipe-id="${this.id}">
+    <div class="card horizontal fav-card" data-recipe-id="${this.id}">
       <div class="card-image" style="width: 33%; height: 100%">
         <img src="${this.image}" alt="${this.name}" style="height: 100%; object-fit: cover" />
       </div>
@@ -384,7 +384,7 @@ class Recipe {
       await Recipe.setActive(id);
     }
     // Retrieve the recipe from the favourites list if it was triggered by a favourite card
-    if (event.currentTarget.classList.contains('read-favourite')) {
+    if (event.currentTarget.classList.contains('fav-card')) {
       await Recipe.setActive(id, true);
     }
 
@@ -665,6 +665,7 @@ function searchRecipes() {
 $(function () {
   $('#narrator').on('ended', Narrator.unload); // Removing temporary audio stream
   $('#content-main').on('click', '.read-more', Recipe.showActive);
+  $('.favouritesCard').on('click', '.fav-card', Recipe.showActive);
   $('body').on('click', '.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
   $('body').on('click', '.fav-add', Recipe.addFavourite);
   $('body').on('click', '.fav-remove', Recipe.removeFavourite);
