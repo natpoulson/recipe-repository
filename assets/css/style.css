@@ -118,6 +118,9 @@ div.card-image > .recipe-card-badges {
   width: 100%;
 }
 
+.favourite-controls a {
+  margin: 8px;
+}
 
 /* recipe.html custom css */
 .recipe-page-description {

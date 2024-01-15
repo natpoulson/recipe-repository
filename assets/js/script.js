@@ -8,9 +8,6 @@ class Recipe {
   time = 0;
   instructions = [];
   ingredients = [];
-  hasMeat = false;
-  hasDairy = false;
-  hasGluten = false;
   source = "";
 
   // Constructor
@@ -137,9 +134,7 @@ class Recipe {
         <div class="card-image">
           <img class="recipe-card-badges" src="${this.image}" alt="${this.name}" />
           <div class="recipe-card-details">
-            <a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red">
-              <i class="material-icons">favorite</i>
-              </a>
+            ${this.favouriteCheck}
             <a aria-label="Read Aloud" class="btn-floating waves-effect waves-light red accent-1 btn-narrate" data-type="0" data-recipe-id="${this.id}">
               <i class="material-icons">volume_up</i>
               </a>
@@ -174,7 +169,25 @@ class Recipe {
   }
 
   get favouriteCard() {
-    return ``; // Add your HTML snippet for favourite cards here!
+    return `<div class="col s12">
+    <div class="card horizontal" data-recipe-id="${this.id}">
+      <div class="card-image" style="width: 33%; height: 100%">
+        <img src="${this.image}" alt="${this.name}" style="height: 100%; object-fit: cover" />
+      </div>
+      <div class="card-stacked" style="width: 67%">
+        <div class="card-content">
+          <span class="card-title">${this.name}</span>
+          <p>${this.description}</p>
+        </div>
+      </div>
+      <div class="favourite-controls" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <a class="btn-floating waves-effect waves-light red accent-1 btn-narrate" data-recipe-id="${this.id}" data-type="1">
+          <i class="material-icons">volume_up</i>
+        </a>
+        ${this.favouriteCheck}
+      </div>
+    </div>
+  </div>`;
   }
 
   get activeTemplate() {
@@ -182,8 +195,9 @@ class Recipe {
       <div class="col">
         <h1>${this.name}</h1>
       </div>
-      <div id="recipe-page-header" class="col"><a class="btn-floating waves-effect waves-light red btn-narrate"><i class="material-icons">favorite</i></a>
-        <a class="btn-floating waves-effect waves-light red accent-1" data-type="2"><i class="material-icons">volume_up</i></a>
+      <div id="recipe-page-header" class="col">
+        ${this.favouriteCheck}
+        <a class="btn-floating waves-effect waves-light red accent-1 btn-narrate" data-type="2"><i class="material-icons">volume_up</i></a>
       </div>
     </section>
     <section class="row recipe-page-description">
@@ -230,6 +244,13 @@ class Recipe {
       </div>
     </div>
   </section>`;
+  }
+
+  get favouriteCheck() {
+    if (Recipe.favourites.findIndex(a => a.id === this.id) !== -1) {
+      return `<a aria-label="Add Recipe to Favourites" class="btn-floating waves-effect waves-light red add-fav" data-recipe-id="${this.id}"><i class="material-icons">favorite</i></a>`;
+    }
+    return `<a aria-label="Remove Recipe from Favourites" class="btn-floating waves-effect waves-light red accent-1 fav-remove" data-recipe-id="${this.id}"><i class="material-icons">remove</i></a>`;
   }
 
   get formattedIngredients() {
@@ -416,11 +437,21 @@ class Recipe {
 
   static loadFavourites() {
     if (localStorage.getItem(Recipe.config.favStoreName)) {
-      const tempFavs = JSON.parse(localStorage.getItem(Recipe.config.favStoreName));
+      const tempFavs = JSON.parse(localStorage.getItem(Recipe.config.favStoreName)); // Staging the data for consumption
       for (const fav of tempFavs) {
-        Recipe.favourites.push(new Recipe(Number(fav.id), fav, true));
+        Recipe.favourites.push(new Recipe(Number(fav.id), fav, true)); // Direct import into new objects
       }
     }
+  }
+
+  static renderFavourites() {
+    const favouritesList = $('.favouritesCard');
+    let contents = `<h2>Favourites</h2>\n`; // Pre-format with the header since it'll be erased
+    for (const recipe of Recipe.favourites) {
+      contents += `${recipe.favouriteCard}\n`;
+    }
+    contents = contents.replace(/\n$/, ''); // Clean up last line break
+    favouritesList.html(contents); // Replace with formatted HTML
   }
 
 }
@@ -618,13 +649,16 @@ function searchRecipes() {
 
 }
 
-// Listeners
-$('#narrator').on('ended', Narrator.unload); // Removing temporary audio stream
-$('#content-main').on('click', '.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
-$('#content-main').on('click', '.read-more', Recipe.showActive);
+// Listeners and inits
+$(function () {
+  $('#narrator').on('ended', Narrator.unload); // Removing temporary audio stream
+  $('#content-main').on('click', '.btn-narrate', Narrator.parse); // Set up delegated event listener for narrator elements.
+  $('#content-main').on('click', '.read-more', Recipe.showActive);
+  searchBtn.addEventListener("click", function () {
+    alertdiv.text("");
+    card.html("");
+    searchRecipes();
+  });
 
-searchBtn.addEventListener("click", function () {
-  alertdiv.text("");
-  card.html("");
-  searchRecipes();
+  Recipe.loadFavourites(); // Load any favourites in local storage
 });
