@@ -7,7 +7,7 @@
 
 .brand-logo,
 footer {
-  font-family: "July it", sans-serif;
+  font-family: "Petit Formal Script", sans-serif;
 }
 
 .page-footer {
@@ -118,6 +118,9 @@ div.card-image > .recipe-card-badges {
   width: 100%;
 }
 
+.favourite-controls a {
+  margin: 8px;
+}
 
 /* recipe.html custom css */
 .recipe-page-description {
@@ -177,6 +180,9 @@ padding: 20px;
   background-color: #f2f2f2;
   border-radius: 50px;
 }
+.fav-card:hover {
+  cursor: pointer;
+}
 
 /* STACEY WORK FOR FAVOURITE MODAL*/
 .favouritesCard {
@@ -200,7 +206,7 @@ padding: 20px;
 
 
 .favouritesCard h2 {
-  font-family: 'july it', sans-serif;
+  font-family: 'Petit Formal Script', sans-serif;
   color: #000000;
   margin: 0;
   text-align: center;
@@ -260,7 +266,7 @@ background-color: #2BBBAD;
 }
   
   .card-title {
-    font-family: 'july it', sans-serif;
+    font-family: 'Petit Formal Script', sans-serif;
     padding: 10px;
   }
 
